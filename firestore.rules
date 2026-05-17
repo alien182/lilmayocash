@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // The public leaderboard: anyone can read, only Cloud Functions
+    // (Admin SDK) can write. This is what stops devtools cheats.
+    match /leaderboard/{entryId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Run docs are server-only. Clients never touch them directly;
+    // they only know the runId returned from the startRun callable.
+    match /runs/{runId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // Per-user state (rate limit timestamps). Server-only too.
+    match /users/{uid} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}
