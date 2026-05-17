@@ -15,6 +15,12 @@
     padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
   .brand { font-weight: 700; letter-spacing: 4px; font-size: 18px; color: #ffffff; }
   .brand .cash { color: #2d5a27; }
+  .nav-alien { font-size: 22px; line-height: 1;
+    /* Recolor the green/grey 👽 to a warm tan / human skin tone.
+       grayscale strips the green, sepia adds a warm brown base, the
+       hue-rotate nudges toward tan/peach (away from yellow), saturate
+       deepens the color, brightness lifts it off the dark nav. */
+    filter: grayscale(1) sepia(1) saturate(1.8) hue-rotate(-25deg) brightness(1.0); }
   .nav-links a { color: #cfe9ff; text-decoration: none; margin-left: 24px; font-size: 14px;
     opacity: 0.8; transition: opacity 0.2s; }
   .nav-links a:hover { opacity: 1; }
@@ -44,6 +50,7 @@
     box-shadow: 0 8px 28px rgba(45,90,39,0.45); }
   .hero .hero-play-btn:active { transform: translateY(0); }
   .hero .cash-green-hero { color: #4caf50; -webkit-text-fill-color: #4caf50; }
+  .hero h1 .cash-green-hero { color: #2d5a27; -webkit-text-fill-color: #2d5a27; }
   .hero .tag { font-size: clamp(13px, 1.8vw, 16px); position: relative;
     max-width: 720px; margin: 20px auto 28px; line-height: 1.8;
     letter-spacing: 3px; font-weight: 600;
@@ -217,11 +224,12 @@
 
 <nav class="nav">
   <div class="brand">LILMAYO.<span class="cash">CASH</span></div>
+  <div class="nav-alien">👽</div>
 </nav>
 
 <section class="hero">
   <a href="#play" class="hero-play-btn">PLAY</a>
-  <h1>LIL MAYO</h1>
+  <h1>LIL MAYO <span class="cash-green-hero">CASH</span></h1>
   <div class="play-label">on his way to <span class="c-g">7</span><span class="c-r">E</span><span class="c-o">L</span><span class="c-g">E</span><span class="c-r">V</span><span class="c-o">E</span><span class="c-g">N</span></div>
   <p class="tag">
     <span class="tag-line">DODGE TRAFFIC | COLLECT <span class="cash-green-hero">CASH</span></span>
@@ -322,12 +330,12 @@
   // these values publicly — they identify your project, not authorize it.
   // Get it from Firebase Console → Project Settings → Your apps → Web app.
   const firebaseConfig = {
-  apiKey: "AIzaSyC_wcz5WprXQ4Q__-mBgdYBfp5Tta9O5is",
-  authDomain: "collect-9c6c9.firebaseapp.com",
-  projectId: "collect-9c6c9",
-  storageBucket: "collect-9c6c9.firebasestorage.app",
-  messagingSenderId: "51162547067",
-  appId: "1:51162547067:web:d41ad26a4dbf5d984c73de",
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // If your Cloud Functions are in a non-default region, set it here.
