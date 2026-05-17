@@ -303,13 +303,13 @@
   // Paste your project's config object here. It's safe to expose
   // these values publicly — they identify your project, not authorize it.
   // Get it from Firebase Console → Project Settings → Your apps → Web app.
-const firebaseConfig = {
-  apiKey: "AIzaSyC_wcz5WprXQ4Q__-mBgdYBfp5Tta9O5is",
-  authDomain: "collect-9c6c9.firebaseapp.com",
-  projectId: "collect-9c6c9",
-  storageBucket: "collect-9c6c9.firebasestorage.app",
-  messagingSenderId: "51162547067",
-  appId: "1:51162547067:web:d41ad26a4dbf5d984c73de",
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // If your Cloud Functions are in a non-default region, set it here.
@@ -532,10 +532,27 @@ function openNameEntry(opts){
 
     const submitBtn = document.getElementById('ne-submit');
 
+    // ---- RESET LEFTOVER STATE from a previous open of this modal ----
+    // The modal's DOM nodes are reused across opens, so any state we set
+    // last time (button text, disabled, description error color) sticks
+    // around until we explicitly clear it here.
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'SAVE';
+    const desc = document.querySelector('.ne-desc');
+    if (desc){
+      desc.textContent = 'Flex on the leaderboard with your name/@ or just type burn b!tch! Top Ten Prize... Airdrop? 👀';
+      desc.style.color = '';
+      desc.style.fontStyle = '';
+    }
+
     function cleanup(){
       modal.style.display = 'none';
       submitBtn.onclick = null;
       nameInput.onkeydown = null;
+      // Reset the button so it's ready for the next time the modal opens,
+      // even if the user re-qualifies later in the same browser session.
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'SAVE';
     }
     async function doSubmit(){
       const raw = (nameInput.value || '').trim().slice(0, 12).toUpperCase();
@@ -554,12 +571,20 @@ function openNameEntry(opts){
       submitBtn.disabled = true;
       submitBtn.textContent = 'SAVING…';
       try {
-        await Leaderboard.submit({
-          runId:    opts.runId,
-          name:     raw,
-          cash:     opts.cash,
-          topSpeed: opts.topSpeed,
-        });
+        // 15-second timeout so a hung network call can't lock the button
+        // forever (Cloud Function cold starts can take 5-10s on a slow day).
+        await Promise.race([
+          Leaderboard.submit({
+            runId:    opts.runId,
+            name:     raw,
+            cash:     opts.cash,
+            topSpeed: opts.topSpeed,
+          }),
+          new Promise((_, rej) => setTimeout(
+            () => rej(new Error('Timed out. Check your connection and try again.')),
+            15000
+          )),
+        ]);
       } catch (err){
         console.error('[lil-mayo] submitScore failed:', err);
         submitBtn.disabled = false;
