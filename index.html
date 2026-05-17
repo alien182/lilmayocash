@@ -7,7 +7,8 @@
 <style>
   :root { color-scheme: dark; }
   html, body { margin: 0; padding: 0; min-height: 100%; background: #050615; color: #e6f0ff;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
   body { overflow-x: hidden; }
   .nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
     background: rgba(5,6,21,0.7); border-bottom: 0.5px solid rgba(120,180,255,0.15);
@@ -32,6 +33,16 @@
     letter-spacing: -2px; line-height: 0.95; position: relative;
     background: linear-gradient(180deg, #ffffff 0%, #e8f1ff 50%, #b8d4f5 100%);
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero .hero-play-btn { display: inline-block; position: relative;
+    background: #2d5a27; color: #ffffff; text-decoration: none;
+    border: 0.5px solid #4a8a3f; border-radius: 10px;
+    padding: 14px 44px; font-size: 18px; font-weight: 800; letter-spacing: 4px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 22px rgba(45,90,39,0.35);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease; }
+  .hero .hero-play-btn:hover { background: #3d7434; transform: translateY(-1px);
+    box-shadow: 0 8px 28px rgba(45,90,39,0.45); }
+  .hero .hero-play-btn:active { transform: translateY(0); }
   .hero .cash-green-hero { color: #4caf50; -webkit-text-fill-color: #4caf50; }
   .hero .tag { font-size: clamp(13px, 1.8vw, 16px); position: relative;
     max-width: 720px; margin: 20px auto 28px; line-height: 1.8;
@@ -97,6 +108,12 @@
   #tier-popup.show { opacity: 1; transform: translateX(0); }
   #tier-popup .pop-tier { font-size: 16px; font-weight: 600; color: #b4ffc4; }
   #tier-popup .pop-sub { font-size: 10px; letter-spacing: 1.5px; opacity: 0.7; margin-top: 2px; }
+  /* Smaller tier popup on mobile so it doesn't dominate the small screen */
+  @media (max-width: 600px) {
+    #tier-popup { top: 48px; right: 8px; padding: 5px 9px; min-width: 0; border-radius: 6px; }
+    #tier-popup .pop-tier { font-size: 12px; }
+    #tier-popup .pop-sub { font-size: 8px; letter-spacing: 1px; margin-top: 1px; }
+  }
   .features { padding: 60px 28px; max-width: 1100px; margin: 0 auto; }
   .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   @media (max-width: 720px) {
@@ -203,7 +220,8 @@
 </nav>
 
 <section class="hero">
-  <h1>LIL MAYO 👽</h1>
+  <a href="#play" class="hero-play-btn">PLAY</a>
+  <h1>LIL MAYO</h1>
   <div class="play-label">on his way to <span class="c-g">7</span><span class="c-r">E</span><span class="c-o">L</span><span class="c-g">E</span><span class="c-r">V</span><span class="c-o">E</span><span class="c-g">N</span></div>
   <p class="tag">
     <span class="tag-line">DODGE TRAFFIC | COLLECT <span class="cash-green-hero">CASH</span></span>
@@ -304,12 +322,12 @@
   // these values publicly — they identify your project, not authorize it.
   // Get it from Firebase Console → Project Settings → Your apps → Web app.
   const firebaseConfig = {
-  apiKey: "AIzaSyC_wcz5WprXQ4Q__-mBgdYBfp5Tta9O5is",
-  authDomain: "collect-9c6c9.firebaseapp.com",
-  projectId: "collect-9c6c9",
-  storageBucket: "collect-9c6c9.firebasestorage.app",
-  messagingSenderId: "51162547067",
-  appId: "1:51162547067:web:d41ad26a4dbf5d984c73de",
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // If your Cloud Functions are in a non-default region, set it here.
@@ -756,7 +774,7 @@ function openNameEntry(opts){
     const finalTopSpeed = topSpeed;
     overlay.classList.add('crashed-out');
     overlay.style.display = 'flex';
-    overlay.innerHTML = `<div><div class="title-bg" style="color:#ffb4b4;">CRASHED OUT</div><div class="sub-bg">Collected</div><div style="font-size:48px;font-weight:500;margin-bottom:4px;color:#b4ffc4;">$${finalScore.toLocaleString()}</div><div style="font-size:13px;opacity:0.75;margin-bottom:22px;">Top speed reached: ${finalTopSpeed.toFixed(2)}×</div><button id="restart-btn" style="background:#2d5a27;color:white;border:0.5px solid #4a8a3f;padding:12px 32px;border-radius:8px;cursor:pointer;font-size:17px;letter-spacing:2px;font-weight:700;">AGAIN</button></div>`;
+    overlay.innerHTML = `<div><div class="title-bg" style="color:#ffb4b4;">CRASHED OUT</div><div style="font-size:48px;font-weight:500;margin-bottom:4px;color:#b4ffc4;">$${finalScore.toLocaleString()}</div><div class="sub-bg" style="margin-bottom:8px;">Collected</div><div style="font-size:13px;opacity:0.75;margin-bottom:22px;">Top speed reached: ${finalTopSpeed.toFixed(2)}×</div><button id="restart-btn" style="background:#2d5a27;color:white;border:0.5px solid #4a8a3f;padding:12px 32px;border-radius:8px;cursor:pointer;font-size:17px;letter-spacing:2px;font-weight:700;">PLAY AGAIN</button></div>`;
     document.getElementById('restart-btn').onclick = start;
     // Check if this run makes the leaderboard. If so, prompt for name.
     // If we don't have a runId (startRun failed), don't even prompt —
