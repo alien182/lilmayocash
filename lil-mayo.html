@@ -1,0 +1,1466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Lil Mayo — Cash Collect</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; padding: 0; min-height: 100%; background: #050615; color: #e6f0ff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { overflow-x: hidden; }
+  .nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px);
+    background: rgba(5,6,21,0.7); border-bottom: 0.5px solid rgba(120,180,255,0.15);
+    padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+  .brand { font-weight: 700; letter-spacing: 4px; font-size: 18px; color: #ffffff; }
+  .brand .cash { color: #2d5a27; }
+  .nav-links a { color: #cfe9ff; text-decoration: none; margin-left: 24px; font-size: 14px;
+    opacity: 0.8; transition: opacity 0.2s; }
+  .nav-links a:hover { opacity: 1; }
+  .hero { position: relative; padding: 80px 28px 40px;
+    background: radial-gradient(ellipse at 50% 0%, #1a1535 0%, #0a0a1f 50%, #050615 100%);
+    text-align: center; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 70% 50%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1.5px 1.5px at 40% 70%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 80% 20%, rgba(255,255,255,0.5), transparent);
+    background-size: 400px 400px; animation: drift 60s linear infinite; opacity: 0.6; }
+  @keyframes drift { from { background-position: 0 0; } to { background-position: -400px -400px; } }
+  .hero h1 { font-size: clamp(48px, 10vw, 96px); margin: 0 0 18px; font-weight: 800;
+    letter-spacing: -2px; line-height: 0.95; position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, #e8f1ff 50%, #b8d4f5 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero .cash-green-hero { color: #4caf50; -webkit-text-fill-color: #4caf50; }
+  .hero .tag { font-size: clamp(13px, 1.8vw, 16px); position: relative;
+    max-width: 720px; margin: 20px auto 28px; line-height: 1.8;
+    letter-spacing: 3px; font-weight: 600;
+    color: #d8e6fa; text-align: center; }
+  .hero .tag .tag-line { display: block; }
+  .hero .play-label { font-size: clamp(11px, 1.4vw, 13px); color: #d8e6fa;
+    letter-spacing: 4px; font-weight: 600; font-style: italic; margin-bottom: 14px;
+    text-align: center; position: relative; }
+  .hero .play-label .c-g { color: #008061; font-weight: 800; }
+  .hero .play-label .c-r { color: #ed1c24; font-weight: 800; }
+  .hero .play-label .c-o { color: #f5821f; font-weight: 800; }
+  .hero-cta { position: relative; display: inline-flex; gap: 14px; }
+  .btn { background: linear-gradient(180deg, #3a6de6, #2a5dd6); color: white;
+    border: 0.5px solid #4d82ff; padding: 14px 28px; border-radius: 10px;
+    cursor: pointer; font-size: 15px; letter-spacing: 1.5px; font-weight: 600;
+    text-decoration: none; display: inline-block; transition: transform 0.15s, box-shadow 0.15s; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(74,130,255,0.35); }
+  .btn.ghost { background: transparent; border-color: rgba(180,255,196,0.4); color: #b4ffc4; }
+  .game-section { padding: 24px 16px 60px; max-width: 1100px; margin: 0 auto; }
+  .game-section h2 { font-size: clamp(28px, 4vw, 40px); margin: 12px 0 8px;
+    letter-spacing: -1px; font-weight: 700; }
+  .game-section .sub { opacity: 0.75; margin-bottom: 24px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+  .cash-green { color: #2d5a27; }
+  .game-frame { position: relative; width: 100%; aspect-ratio: 16/10;
+    background: #0a0e1f; border-radius: 16px; overflow: hidden;
+    border: 0.5px solid rgba(120,180,255,0.25);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(74,130,255,0.1) inset; }
+  #game { width: 100%; height: 100%; display: block; }
+  #hud { position: absolute; top: 14px; left: 14px; right: 14px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    pointer-events: none; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    color: #cfe9ff; z-index: 5; }
+  .hud-pill { background: rgba(8,14,40,0.6); padding: 6px 10px; border-radius: 6px;
+    border: 0.5px solid rgba(120,180,255,0.25); }
+  .hud-pill .label { font-size: 11px; opacity: 0.7; letter-spacing: 1px; }
+  .hud-pill .val { font-size: 20px; font-weight: 500; }
+  #score-pill .val { color: #b4ffc4; }
+  #tier-pill { border-color: rgba(255,200,120,0.25); text-align: right; }
+  #tier-pill .val { color: #ffd97a; }
+  #overlay { position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; background: rgba(5,6,22,0.78); backdrop-filter: blur(4px);
+    text-align: center; padding: 20px; z-index: 10; }
+  /* When the game-over screen is up, overlay gets an image background.
+     The .crashed-out class is added by gameOver() in JS. */
+  #overlay.crashed-out { background: rgba(5,6,22,0.55); }
+  #overlay.crashed-out::before { content: ""; position: absolute; inset: 0;
+    background-image: url("images/crashed-bg.png");
+    background-size: cover; background-position: center;
+    filter: brightness(0.40) saturate(1.1); z-index: -1; }
+  #overlay.crashed-out > div { position: relative; z-index: 1; }
+  #overlay .title-bg { font-size: clamp(28px, 5vw, 40px); font-weight: 500;
+    letter-spacing: 4px; margin-bottom: 8px; }
+  #overlay .sub-bg { font-size: 14px; opacity: 0.8; margin-bottom: 18px;
+    max-width: 380px; margin-left:auto; margin-right:auto;}
+  #overlay .keys { font-size: 13px; opacity: 0.7; margin-bottom: 22px; line-height: 1.8; }
+  #tier-popup { position: absolute; top: 64px; right: 14px; pointer-events: none;
+    background: rgba(20,40,30,0.85); border: 0.5px solid rgba(180,255,196,0.4);
+    border-radius: 8px; padding: 8px 14px; color: #cdf4d8;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    opacity: 0; transform: translateX(10px); transition: opacity 0.3s, transform 0.3s;
+    z-index: 6; min-width: 140px; }
+  #tier-popup.show { opacity: 1; transform: translateX(0); }
+  #tier-popup .pop-tier { font-size: 16px; font-weight: 600; color: #b4ffc4; }
+  #tier-popup .pop-sub { font-size: 10px; letter-spacing: 1.5px; opacity: 0.7; margin-top: 2px; }
+  .features { padding: 60px 28px; max-width: 1100px; margin: 0 auto; }
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 720px) {
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+  .feature-img { border-radius: 14px; overflow: hidden;
+    background: linear-gradient(180deg, rgba(20,30,60,0.5), rgba(10,15,35,0.5));
+    border: 0.5px solid rgba(120,180,255,0.18); aspect-ratio: 1 / 1;
+    display: flex; align-items: center; justify-content: center; }
+  .feature-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  footer { padding: 40px 28px 60px; border-top: 0.5px solid rgba(120,180,255,0.12);
+    text-align: center; opacity: 0.6; font-size: 13px; }
+  button#start-btn { background: #2d5a27; color: white; border: 0.5px solid #4a8a3f;
+    padding: 12px 32px; border-radius: 8px; cursor: pointer; font-size: 17px;
+    letter-spacing: 2px; font-weight: 700; }
+  button#start-btn:hover { background: #3d7434; }
+
+  /* ===== LEADERBOARD ===== */
+  .leaderboard-section { padding: 24px 16px 40px; max-width: 1100px; margin: 0 auto; }
+  .leaderboard-section h2 { font-size: clamp(28px, 4vw, 40px); margin: 12px 0 16px;
+    letter-spacing: -1px; font-weight: 700; color: #ffffff; }
+  .lb-topten { color: #2d5a27; font-size: 0.45em; letter-spacing: 3px;
+    font-weight: 800; margin-left: 14px; vertical-align: middle; }
+  .lb-table { background: linear-gradient(180deg, rgba(20,30,60,0.45), rgba(10,15,35,0.45));
+    border: 0.5px solid rgba(120,180,255,0.18); border-radius: 14px; overflow: hidden; }
+  .lb-row { display: grid; grid-template-columns: 56px 1fr 110px 160px;
+    align-items: center; padding: 14px 22px; font-size: 14px;
+    border-bottom: 0.5px solid rgba(120,180,255,0.08); }
+  .lb-row:last-child { border-bottom: 0; }
+  .lb-head { background: rgba(0,0,0,0.25); font-size: 11px; letter-spacing: 2px;
+    color: #8aa6cc; font-weight: 700; padding: 12px 22px; }
+  .lb-rank { font-weight: 700; color: #ffffff; }
+  .lb-row.lb-empty .lb-rank { color: rgba(255,255,255,0.30); }
+  .lb-row.lb-empty { color: rgba(255,255,255,0.30); }
+  .lb-row.lb-medal-1 .lb-rank { color: #ffd24a; }
+  .lb-row.lb-medal-2 .lb-rank { color: #d8e6fa; }
+  .lb-row.lb-medal-3 .lb-rank { color: #f5821f; }
+  .lb-name { font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .lb-speed { color: #d8e6fa; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .lb-row.lb-empty .lb-speed { color: rgba(216,230,250,0.30); }
+  .lb-cash { color: #4caf50; font-weight: 700; font-family: ui-monospace, "SF Mono", Menlo, monospace; text-align: right; }
+  .lb-row.lb-empty .lb-cash { color: rgba(76,175,80,0.30); }
+  .lb-row.lb-just-added { animation: lb-flash 1.6s ease-out; }
+  @keyframes lb-flash {
+    0% { background: rgba(45,90,39,0.55); }
+    100% { background: transparent; }
+  }
+  @media (max-width: 600px) {
+    .lb-row { grid-template-columns: 36px 1fr 70px 90px; padding: 12px 14px; font-size: 12px; }
+    .lb-head { padding: 10px 14px; font-size: 10px; letter-spacing: 1px; }
+  }
+
+  /* ===== NAME ENTRY MODAL ===== */
+  .ne-modal { position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .ne-card { position: relative; width: 100%; max-width: 460px;
+    border-radius: 18px; overflow: hidden;
+    border: 0.5px solid rgba(120,180,255,0.25);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+  .ne-bg { position: absolute; inset: 0;
+    background-image: url("images/congratz-bg.png");
+    background-size: cover; background-position: center;
+    filter: brightness(0.45) saturate(1.1); }
+  .ne-bg::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,15,35,0.35), rgba(10,15,35,0.85)); }
+  .ne-content { position: relative; z-index: 2; padding: 32px 28px; text-align: center; color: white; }
+  .ne-headline { font-size: 28px; font-weight: 800; letter-spacing: 3px;
+    color: #ffffff; margin-bottom: 4px;
+    text-shadow: 0 0 14px rgba(255,255,255,0.25); line-height: 1.2; }
+  .ne-rank-line { font-size: 15px; letter-spacing: 3px; color: #ffd24a;
+    font-weight: 800; margin-bottom: 14px; }
+  .ne-desc { font-size: 13px; color: #d8e6fa; opacity: 0.85;
+    line-height: 1.5; max-width: 360px; margin: 0 auto 22px;
+    font-style: italic; }
+  .ne-stats { display: flex; gap: 18px; justify-content: center; margin-bottom: 24px; }
+  .ne-stats > div { background: rgba(0,0,0,0.45); border: 0.5px solid rgba(120,180,255,0.15);
+    padding: 12px 18px; border-radius: 10px; min-width: 130px; }
+  .ne-stats-label { display: block; font-size: 10px; letter-spacing: 2px;
+    color: #8aa6cc; margin-bottom: 4px; font-weight: 600; }
+  .ne-stats-val { display: block; font-size: 20px; font-weight: 800;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; color: #ffffff; }
+  .ne-label { display: block; font-size: 11px; letter-spacing: 3px; color: #d8e6fa;
+    margin-bottom: 8px; font-weight: 700; }
+  #ne-name { width: 100%; box-sizing: border-box; padding: 14px 18px;
+    border-radius: 10px; border: 0.5px solid rgba(120,180,255,0.30);
+    background: rgba(0,0,0,0.55); color: #ffffff;
+    font-size: 18px; letter-spacing: 4px; text-align: center;
+    text-transform: uppercase; font-weight: 700;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace; outline: none; }
+  #ne-name:focus { border-color: #2d5a27; box-shadow: 0 0 0 3px rgba(45,90,39,0.30); }
+  #ne-name::placeholder { color: rgba(255,255,255,0.25); letter-spacing: 2px; }
+  .ne-buttons { display: flex; gap: 12px; margin-top: 20px; }
+  .ne-btn { flex: 1; padding: 14px; border-radius: 10px; cursor: pointer;
+    font-size: 14px; letter-spacing: 2px; font-weight: 700; border: 0.5px solid; }
+  .ne-submit { background: #2d5a27; color: white; border-color: #4a8a3f; }
+  .ne-submit:hover { background: #3d7434; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">LILMAYO.<span class="cash">CASH</span></div>
+</nav>
+
+<section class="hero">
+  <h1>LIL MAYO 👽</h1>
+  <div class="play-label">on his way to <span class="c-g">7</span><span class="c-r">E</span><span class="c-o">L</span><span class="c-g">E</span><span class="c-r">V</span><span class="c-o">E</span><span class="c-g">N</span></div>
+  <p class="tag">
+    <span class="tag-line">DODGE TRAFFIC | COLLECT <span class="cash-green-hero">CASH</span></span>
+    <span class="tag-line">GET ON THE LEADERBOARD</span>
+  </p>
+</section>
+
+<section id="play" class="game-section">
+  <h2>COLLECT <span class="cash-green">CASH</span></h2>
+
+  <div class="game-frame">
+    <canvas id="game"></canvas>
+    <div id="hud">
+      <div id="score-pill" class="hud-pill"><div class="label">CASH</div><div id="score" class="val">$0</div></div>
+      <div class="hud-pill"><div class="label">SPEED</div><div id="speed" class="val">1.00×</div></div>
+      <div id="tier-pill" class="hud-pill"><div class="label">BILL TIER</div><div id="tier" class="val">$1</div></div>
+    </div>
+    <div id="tier-popup">
+      <div id="popup-tier" class="pop-tier">$5 BILLS</div>
+      <div class="pop-sub">TIER UNLOCKED</div>
+    </div>
+    <div id="overlay">
+      <div>
+        <div class="title-bg">HOW TO PLAY</div>
+        <div class="sub-bg">One hit and you're cooked</div>
+        <div class="keys">← → or A / D &nbsp;·&nbsp; Spacebar to Launch</div>
+        <button id="start-btn">PLAY</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="leaderboard" class="leaderboard-section">
+  <h2>TOP 10 <span class="lb-topten">LEADERBOARD</span></h2>
+  <div class="lb-table">
+    <div class="lb-row lb-head">
+      <div class="lb-rank">#</div>
+      <div class="lb-name">NAME</div>
+      <div class="lb-speed">TOP SPEED</div>
+      <div class="lb-cash">CASH COLLECTED</div>
+    </div>
+    <div id="lb-rows"><!-- rows injected by JS --></div>
+  </div>
+</section>
+
+<!-- Name entry modal — shown when player makes the top 10 -->
+<div id="name-entry-modal" class="ne-modal" style="display:none;">
+  <div class="ne-card">
+    <div class="ne-bg"></div>
+    <div class="ne-content">
+      <div class="ne-headline">CONGRATZ!</div>
+      <div class="ne-rank-line" id="ne-headline-rank"></div>
+      <div class="ne-desc">Flex on the leaderboard with your name/@ or just type burn b!tch! Top Ten Prize... Airdrop? 👀</div>
+      <div class="ne-stats">
+        <div><span class="ne-stats-label">CASH</span><span id="ne-cash" class="ne-stats-val">$0</span></div>
+        <div><span class="ne-stats-label">TOP SPEED</span><span id="ne-speed" class="ne-stats-val">1.00×</span></div>
+      </div>
+      <label class="ne-label" for="ne-name">ENTER YOUR NAME</label>
+      <input id="ne-name" type="text" maxlength="12" autocomplete="off">
+      <div class="ne-buttons">
+        <button id="ne-submit" class="ne-btn ne-submit">SAVE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="about" class="features">
+  <div class="feature-grid">
+    <div class="feature-img"><img src="images/feature-1.png" alt=""></div>
+    <div class="feature-img"><img src="images/feature-2.png" alt=""></div>
+    <div class="feature-img"><img src="images/feature-3.png" alt=""></div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div>LIL MAYO</div>
+</footer>
+
+<!-- ============================================================
+     FIREBASE SDK (modular v10)
+     Loaded from CDN as ES modules. The init script below uses
+     these via the global `firebase` object that we attach.
+     ============================================================ -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
+  import {
+    getAuth, signInAnonymously, onAuthStateChanged
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+  import {
+    getFirestore, collection, query, orderBy, limit, getDocs
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+  import {
+    getFunctions, httpsCallable
+  } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-functions.js';
+
+  // ===== FIREBASE CONFIG =====
+  // Paste your project's config object here. It's safe to expose
+  // these values publicly — they identify your project, not authorize it.
+  // Get it from Firebase Console → Project Settings → Your apps → Web app.
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // If your Cloud Functions are in a non-default region, set it here.
+  // Default is "us-central1". Match what you deploy with.
+  const FUNCTIONS_REGION = "us-central1";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const functions = getFunctions(app, FUNCTIONS_REGION);
+
+  // Expose what we need to the rest of the script
+  window.fb = {
+    auth, db, functions,
+    signInAnonymously: () => signInAnonymously(auth),
+    onAuthStateChanged: (cb) => onAuthStateChanged(auth, cb),
+    collection, query, orderBy, limit, getDocs,
+    httpsCallable: (name) => httpsCallable(functions, name),
+  };
+
+  // Sign in anonymously on load. Every visitor gets a stable UID
+  // for the lifetime of their browser/cookie. No personal data is stored.
+  signInAnonymously(auth).catch((err) => {
+    console.error('[lil-mayo] anonymous sign-in failed:', err);
+  });
+</script>
+
+<script>
+// ============================================================
+// FILE NAVIGATION — JUMP HERE WITH CTRL-F
+// ============================================================
+//   [LEADERBOARD]   The Firebase-backed module + UI renderer
+//   [NAME ENTRY]    The Congratz! pop-up modal (background: images/congratz-bg.png)
+//   [GAME INIT]     Main game IIFE starts here
+//   [ALIEN HEAD]    drawAlienHead() — silhouette + eyes + mouth
+//   [SHIP]          drawShip() — saucer + head placement
+//   [STATE]         running, score, speed, topSpeed, currentRunId
+//   [START/RESET]   start() + reset() + gameOver()
+//   [BILL TIERS]    The $1 / $5 / $20 / $50 / $100 tier table
+//   [BUILDINGS]     Background skyline geometry
+//   [HEAD TURN]     updateHeadTurn() — animation timing
+//   [SPEED CURVE]   The speed = f(distance) formula
+//   [INPUT]         Keydown handlers
+//
+// IMAGE PATHS USED BY THIS FILE (put files at these paths in your repo):
+//   images/congratz-bg.png   — background of the leaderboard pop-up
+//   images/crashed-bg.png    — background of the in-game crashed-out screen
+//   images/feature-1.png     — first image slot under the leaderboard
+//   images/feature-2.png     — middle image slot under the leaderboard
+//   images/feature-3.png     — third image slot under the leaderboard
+// ============================================================
+// ============================================================
+// [LEADERBOARD] · Firebase backed
+//
+// Read flow:   getTop10() reads /leaderboard collection directly (public).
+// Write flow:  startRun() → Cloud Function creates a /runs doc, returns runId.
+//              Play the game.
+//              submit() → Cloud Function validates run + score, then writes
+//              the leaderboard entry server-side. Client cannot write directly.
+//
+// Security model:
+//   • Anonymous Auth: every user has a Firebase UID.
+//   • Firestore rules: /leaderboard read public, /leaderboard write denied,
+//     /runs both denied. Only Cloud Functions (Admin SDK) can write.
+//   • Cloud Function plausibility checks: cash ≤ time × maxRate, topSpeed sane,
+//     name length, profanity filter, rate-limit per UID.
+//
+// Data shape stored in Firestore:
+//   /leaderboard/{auto} = { name, cash, topSpeed, ts, uid }
+//   /runs/{auto}        = { uid, startedAt, used, claimedAt? }   (server-only)
+// ============================================================
+const Leaderboard = (function(){
+  const MAX_ENTRIES = 10;
+
+  // Wait until window.fb is populated by the firebase init module above,
+  // and until anonymous auth has completed at least once. If Firebase isn't
+  // configured or is unreachable, time out so the game still works locally.
+  function fbReady(timeoutMs){
+    if (timeoutMs === undefined) timeoutMs = 4000;
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      function tick(){
+        if (window.fb && window.fb.auth && window.fb.auth.currentUser){
+          resolve(window.fb);
+        } else if (Date.now() - start > timeoutMs){
+          reject(new Error('Firebase not ready (timeout). Check your firebaseConfig.'));
+        } else if (window.fb){
+          // Auth not done yet — listen for it but also keep polling for the timeout.
+          window.fb.onAuthStateChanged((user) => { if (user) resolve(window.fb); });
+          setTimeout(tick, 200);
+        } else {
+          setTimeout(tick, 50);
+        }
+      }
+      tick();
+    });
+  }
+
+  async function getTop10(){
+    try {
+      const fb = await fbReady();
+      const q = fb.query(
+        fb.collection(fb.db, 'leaderboard'),
+        fb.orderBy('cash', 'desc'),
+        fb.limit(MAX_ENTRIES)
+      );
+      const snap = await fb.getDocs(q);
+      return snap.docs.map(d => d.data());
+    } catch (err){
+      console.error('[lil-mayo] getTop10 failed:', err);
+      return [];
+    }
+  }
+
+  async function rankOf(cash){
+    const top = await getTop10();
+    for (let i = 0; i < top.length; i++){
+      if (cash > top[i].cash) return i + 1;
+    }
+    if (top.length < MAX_ENTRIES) return top.length + 1;
+    return 0;
+  }
+  async function qualifies(cash){
+    return (await rankOf(cash)) > 0;
+  }
+
+  // Called when the player clicks PLAY. Server stamps a start time
+  // tied to this UID and returns a runId. The runId must be sent
+  // back with the score on submit.
+  async function startRun(){
+    const fb = await fbReady();
+    const call = fb.httpsCallable('startRun');
+    const result = await call({});
+    return result.data; // { runId, startedAt }
+  }
+
+  // Called after game-over once the player has typed their name.
+  // The Cloud Function validates the run doc, checks plausibility,
+  // and writes the leaderboard entry. Client cannot write directly.
+  async function submit(entry){
+    const fb = await fbReady();
+    const call = fb.httpsCallable('submitScore');
+    const result = await call({
+      runId:    entry.runId,
+      name:     entry.name,
+      cash:     entry.cash,
+      topSpeed: entry.topSpeed,
+    });
+    return result.data; // { ok: true } on success
+  }
+
+  return { getTop10, qualifies, rankOf, startRun, submit, MAX_ENTRIES };
+})();
+
+// ============================================================
+// [LEADERBOARD] · UI Render
+// ============================================================
+async function renderLeaderboard(highlightName){
+  const container = document.getElementById('lb-rows');
+  if (!container) return;
+  const entries = await Leaderboard.getTop10();
+  const rows = [];
+  for (let i = 0; i < Leaderboard.MAX_ENTRIES; i++){
+    const e = entries[i];
+    const rank = i + 1;
+    const medalClass = rank === 1 ? 'lb-medal-1' : rank === 2 ? 'lb-medal-2' : rank === 3 ? 'lb-medal-3' : '';
+    if (e){
+      const justAdded = (highlightName && e.name === highlightName) ? ' lb-just-added' : '';
+      rows.push(
+        `<div class="lb-row ${medalClass}${justAdded}">`+
+        `<div class="lb-rank">${rank}</div>`+
+        `<div class="lb-name">${escapeHtml(e.name)}</div>`+
+        `<div class="lb-speed">${Number(e.topSpeed).toFixed(2)}×</div>`+
+        `<div class="lb-cash">$${Number(e.cash).toLocaleString()}</div>`+
+        `</div>`
+      );
+    } else {
+      rows.push(
+        `<div class="lb-row lb-empty">`+
+        `<div class="lb-rank">${rank}</div>`+
+        `<div class="lb-name">———</div>`+
+        `<div class="lb-speed">—</div>`+
+        `<div class="lb-cash">$0</div>`+
+        `</div>`
+      );
+    }
+  }
+  container.innerHTML = rows.join('');
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Render on load
+document.addEventListener('DOMContentLoaded', () => renderLeaderboard());
+
+// ============================================================
+// [NAME ENTRY] · Modal controller for the Congratz! pop-up.
+// Background image path: images/congratz-bg.png (set via .ne-bg in CSS).
+// ============================================================
+function openNameEntry(opts){
+  // opts: { rank, cash, topSpeed }
+  return new Promise((resolve) => {
+    const modal = document.getElementById('name-entry-modal');
+    // "Congratz You Are in 7th place" — pick the right ordinal.
+    function ordinal(n){
+      const s = ['th','st','nd','rd'];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    }
+    document.getElementById('ne-headline-rank').textContent =
+      'You Are in ' + ordinal(opts.rank) + ' Place';
+    document.getElementById('ne-cash').textContent  = '$' + Number(opts.cash).toLocaleString();
+    document.getElementById('ne-speed').textContent = Number(opts.topSpeed).toFixed(2) + '×';
+    const nameInput = document.getElementById('ne-name');
+    nameInput.value = '';
+    modal.style.display = 'flex';
+    setTimeout(() => nameInput.focus(), 50);
+
+    const submitBtn = document.getElementById('ne-submit');
+
+    function cleanup(){
+      modal.style.display = 'none';
+      submitBtn.onclick = null;
+      nameInput.onkeydown = null;
+    }
+    async function doSubmit(){
+      const raw = (nameInput.value || '').trim().slice(0, 12).toUpperCase();
+      // Require a non-empty name — don't let them save blank.
+      if (!raw){
+        nameInput.focus();
+        nameInput.style.borderColor = '#ed1c24';
+        nameInput.style.boxShadow = '0 0 0 3px rgba(237,28,36,0.25)';
+        setTimeout(() => {
+          nameInput.style.borderColor = '';
+          nameInput.style.boxShadow = '';
+        }, 900);
+        return;
+      }
+      // Disable the button while we wait on the server.
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'SAVING…';
+      try {
+        await Leaderboard.submit({
+          runId:    opts.runId,
+          name:     raw,
+          cash:     opts.cash,
+          topSpeed: opts.topSpeed,
+        });
+      } catch (err){
+        console.error('[lil-mayo] submitScore failed:', err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'SAVE';
+        // Show the message in the description area so the player sees why.
+        const desc = document.querySelector('.ne-desc');
+        if (desc) {
+          desc.textContent = (err && err.message)
+            ? 'Could not save: ' + err.message
+            : 'Could not save your score. Try again.';
+          desc.style.color = '#ed1c24';
+          desc.style.fontStyle = 'normal';
+        }
+        return;
+      }
+      cleanup();
+      await renderLeaderboard(raw);
+      const lb = document.getElementById('leaderboard');
+      if (lb) lb.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      resolve({ saved: true, name: raw });
+    }
+
+    submitBtn.onclick = doSubmit;
+    nameInput.onkeydown = (e) => {
+      if (e.key === 'Enter'){ e.preventDefault(); doSubmit(); }
+    };
+  });
+}
+
+// ============================================================
+// [GAME INIT] · Main game IIFE. Everything below runs on page load.
+// Sections inside: [STATE], [BILL TIERS], [INPUT], [START/RESET],
+// [SPEED CURVE], [HEAD TURN], [ALIEN HEAD], [SHIP].
+// ============================================================
+(function(){
+  function tryInit(){
+    const canvas = document.getElementById('game');
+    if (!canvas){ requestAnimationFrame(tryInit); return; }
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width < 10 || rect.height < 10){ requestAnimationFrame(tryInit); return; }
+    init();
+  }
+  function init(){
+  const canvas = document.getElementById('game');
+  const ctx = canvas.getContext('2d');
+  const wrap = canvas.parentElement;
+  const scoreEl = document.getElementById('score');
+  const speedEl = document.getElementById('speed');
+  const tierEl = document.getElementById('tier');
+  const overlay = document.getElementById('overlay');
+  const startBtn = document.getElementById('start-btn');
+  const tierPopup = document.getElementById('tier-popup');
+  const popupTier = document.getElementById('popup-tier');
+
+  let W = 0, H = 0, cx = 0, horizonY = 0;
+  function resize(){
+    const r = wrap.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(100, r.width * dpr);
+    canvas.height = Math.max(100, r.height * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    W = r.width; H = r.height; cx = W/2; horizonY = H * 0.35;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const CAMERA_PULLBACK = 3.5, CAMERA_HEIGHT = 1.6, FOCAL = 0.95;
+  const LANE_SPACING = 1.0;
+  const LANES_X = [-2,-1,0,1,2].map(i => i * LANE_SPACING);
+  const LANE_DIVIDERS = []; for (let i=0;i<LANES_X.length-1;i++) LANE_DIVIDERS.push((LANES_X[i] + LANES_X[i+1])/2);
+  const ROAD_EDGE = LANES_X[LANES_X.length-1] + LANE_SPACING/2;
+  const FAR_Z = 80, SHIP_Z = 0;
+
+  // Teal replaced with a darker desaturated graphite/slate that reads
+  // distinctly from both black and white, and doesn't compete with the
+  // green bills.
+  const CAR_PALETTE = ['#c93434','#d6a02a','#ffffff','#1a1a1a','#9b3ad6','#e85d8a','#ff8a3a','#6a4a2a','#5a6878'];
+
+  // ---- [BILL TIERS] ----
+  const BILL_TIERS = [
+    { minDist: 0, value: 1, sizeMult: 0.78, label: '$1' },
+    { minDist: 25000, value: 5, sizeMult: 0.88, label: '$5' },
+    { minDist: 50000, value: 20, sizeMult: 1.00, label: '$20' },
+    { minDist: 90000, value: 50, sizeMult: 1.14, label: '$50' },
+    { minDist: 150000, value: 100, sizeMult: 1.30, label: '$100' }
+  ];
+  const BILL_GREEN_BODY = '#1f6a3a', BILL_GREEN_ACCENT = '#9be0b0', BILL_GREEN_TEXT = '#cdf4d8';
+
+  function currentBillTier(){ let tier = BILL_TIERS[0]; for (const t of BILL_TIERS) if (distance >= t.minDist) tier = t; return tier; }
+
+  let laneIndex = 2, shipX = LANES_X[2], bank = 0, shake = 0;
+  let headTurn = 0, headTurnTarget = 0, headTurnTimer = 5000, headHoldTimer = 0, headTurnsDone = 0;
+
+  function project(x, y, z){
+    const dz = z + CAMERA_PULLBACK;
+    if (dz <= 0.05) return null;
+    const scale = (FOCAL * W) / dz;
+    return { x: cx + x * scale, y: horizonY + (CAMERA_HEIGHT - y) * scale, s: scale / W };
+  }
+
+  // ---- [INPUT] · keyboard handling ----
+  const heldKeys = new Set();
+  window.addEventListener('keydown', e => {
+    const k = e.key.toLowerCase();
+    if (['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
+    if (k === ' ' && !running){ start(); return; }
+    if (heldKeys.has(k)) return;
+    heldKeys.add(k);
+    if (!running) return;
+    if (k === 'arrowleft' || k === 'a') laneIndex = Math.max(0, laneIndex - 1);
+    else if (k === 'arrowright' || k === 'd') laneIndex = Math.min(LANES_X.length - 1, laneIndex + 1);
+  }, {passive:false});
+  window.addEventListener('keyup', e => { heldKeys.delete(e.key.toLowerCase()); });
+  canvas.addEventListener('pointerdown', e => {
+    if (!running) return;
+    const r = canvas.getBoundingClientRect();
+    const tx = e.clientX - r.left;
+    if (tx < r.width / 2) laneIndex = Math.max(0, laneIndex - 1);
+    else laneIndex = Math.min(LANES_X.length - 1, laneIndex + 1);
+  });
+
+  // ---- [STATE] · live game variables ----
+  let running = false, score = 0, speed = 1, distance = 0, topSpeed = 1;
+  // runId returned by Cloud Function startRun(). Carried through to submitScore.
+  let currentRunId = null;
+  const cars = [], bills = [], buildings = [], particles = [];
+  let lastTierIndex = 0, popupHideTimer = 0;
+  const streams = [];
+
+  function reset(){
+    score = 0; speed = 1; distance = 0; topSpeed = 1;
+    laneIndex = 2; shipX = LANES_X[2]; bank = 0; shake = 0;
+    cars.length = 0; bills.length = 0; particles.length = 0; streams.length = 0;
+    carSpawnCD = 1200; streamCD = 1500;
+    lastTierIndex = 0;
+    headTurn = 0; headTurnTarget = 0; headTurnTimer = 5000; headHoldTimer = 0; headTurnsDone = 0;
+    buildings.length = 0;
+    for (let i=0;i<60;i++) buildings.push(makeBuilding(Math.random() * FAR_Z));
+    tierPopup.classList.remove('show');
+  }
+  function makeBuilding(z, side){
+    if (side === undefined) side = Math.random() < 0.5 ? -1 : 1;
+    return { side, x: side * (ROAD_EDGE + 0.6 + Math.random()*3), z,
+      h: 2 + Math.random()*5, w: 0.8 + Math.random()*1.4,
+      color: ['#1a2540','#23304f','#2b1f3f','#1f2f3f','#2a2538'][Math.floor(Math.random()*5)],
+      windows: Math.random() < 0.85, seed: Math.random()*1000 };
+  }
+  // ---- [START/RESET] · game lifecycle ----
+  function start(){
+    // Fire startRun in the background — don't make the player wait on the network.
+    // currentRunId fills in when the Cloud Function returns. If the player
+    // crashes before it returns (or it fails entirely), the score just isn't
+    // submittable and the leaderboard prompt is skipped. The game itself
+    // always works, even with no Firebase configured.
+    currentRunId = null;
+    Leaderboard.startRun().then(r => {
+      currentRunId = r && r.runId ? r.runId : null;
+    }).catch(err => {
+      console.warn('[lil-mayo] startRun failed, score will not be submittable:', err);
+    });
+    reset();
+    running = true;
+    overlay.classList.remove('crashed-out');
+    overlay.style.display = 'none';
+  }
+  function gameOver(){
+    running = false;
+    const finalScore = score;
+    const finalTopSpeed = topSpeed;
+    overlay.classList.add('crashed-out');
+    overlay.style.display = 'flex';
+    overlay.innerHTML = `<div><div class="title-bg" style="color:#ffb4b4;">CRASHED OUT</div><div class="sub-bg">Collected</div><div style="font-size:48px;font-weight:500;margin-bottom:4px;color:#b4ffc4;">$${finalScore.toLocaleString()}</div><div style="font-size:13px;opacity:0.75;margin-bottom:22px;">Top speed reached: ${finalTopSpeed.toFixed(2)}×</div><button id="restart-btn" style="background:#2d5a27;color:white;border:0.5px solid #4a8a3f;padding:12px 32px;border-radius:8px;cursor:pointer;font-size:17px;letter-spacing:2px;font-weight:700;">AGAIN</button></div>`;
+    document.getElementById('restart-btn').onclick = start;
+    // Check if this run makes the leaderboard. If so, prompt for name.
+    // If we don't have a runId (startRun failed), don't even prompt —
+    // the server would reject the submission and the user would be confused.
+    (async () => {
+      if (!currentRunId) return;
+      const rank = await Leaderboard.rankOf(finalScore);
+      if (rank > 0 && finalScore > 0){
+        await openNameEntry({ rank, cash: finalScore, topSpeed: finalTopSpeed, runId: currentRunId });
+        // runId is single-use server-side; clear it locally too.
+        currentRunId = null;
+      }
+    })();
+  }
+  startBtn.onclick = start;
+
+  let carSpawnCD = 1200, streamCD = 1500;
+
+  function laneOpen(laneIdx){ for (const c of cars){ if (c.lane === laneIdx && c.z > FAR_Z * 0.55) return false; } return true; }
+  function spawnCar(){
+    const order = [0,1,2,3,4].sort(() => Math.random() - 0.5);
+    let chosen = -1;
+    for (const li of order){ if (laneOpen(li)){ chosen = li; break; } }
+    if (chosen < 0) return;
+    cars.push({ lane: chosen, x: LANES_X[chosen], z: FAR_Z, color: CAR_PALETTE[Math.floor(Math.random()*CAR_PALETTE.length)], hit: false });
+  }
+  function carWillBlock(laneIdx){ for (const c of cars){ if (c.lane === laneIdx && c.z > 2) return true; } return false; }
+  function pickLaneForBill(prevLane){
+    const candidates = [];
+    for (let i=0;i<LANES_X.length;i++) if (!carWillBlock(i)) candidates.push(i);
+    if (candidates.length === 0){
+      let best = 0, bestZ = 0;
+      for (let i=0;i<LANES_X.length;i++){ let farthest = 0; for (const c of cars) if (c.lane === i && c.z > farthest) farthest = c.z; if (farthest > bestZ){ bestZ = farthest; best = i; } }
+      return best;
+    }
+    if (prevLane === null) return candidates[Math.floor(Math.random()*candidates.length)];
+    candidates.sort((a,b) => Math.abs(a-prevLane) - Math.abs(b-prevLane));
+    const pool = candidates.slice(0, Math.min(2, candidates.length));
+    return pool[Math.floor(Math.random()*pool.length)];
+  }
+  function spawnStream(){ const tier = currentBillTier(); return { count: 14 + Math.floor(Math.random()*8), spawned: 0, spawnCD: 0, lastLane: null, tier }; }
+
+  function drawSky(){
+    const g = ctx.createLinearGradient(0,0,0,horizonY);
+    g.addColorStop(0, '#0a0a1f'); g.addColorStop(0.6, '#1a1535'); g.addColorStop(1, '#3a2050');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,horizonY+2);
+    const glow = ctx.createLinearGradient(0, horizonY-30, 0, horizonY+5);
+    glow.addColorStop(0, 'rgba(255,180,120,0)'); glow.addColorStop(1, 'rgba(255,180,120,0.35)');
+    ctx.fillStyle = glow; ctx.fillRect(0, horizonY-30, W, 35);
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    for (let i=0;i<80;i++){ const x = (i*73 % W); const y = (i*31 % Math.max(1,(horizonY-30))); ctx.fillRect(x, y, 1, 1); }
+  }
+  function drawRoad(){
+    const g = ctx.createLinearGradient(0, horizonY, 0, H);
+    g.addColorStop(0, '#1a1820'); g.addColorStop(1, '#0a0a10');
+    ctx.fillStyle = g; ctx.fillRect(0, horizonY, W, H-horizonY);
+    ctx.strokeStyle = 'rgba(220,220,200,0.7)';
+    [-ROAD_EDGE, ROAD_EDGE].forEach(ex => {
+      const top = project(ex, 0, FAR_Z*0.95); const bot = project(ex, 0, -CAMERA_PULLBACK + 0.5);
+      if (!top || !bot) return;
+      ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(top.x, top.y); ctx.lineTo(bot.x, bot.y); ctx.stroke();
+    });
+    const dashLen = 3.0, gapLen = 3.0;
+    const scroll = (distance * 0.014) % (dashLen + gapLen);
+    LANE_DIVIDERS.forEach((lx) => {
+      let z = -CAMERA_PULLBACK + 0.5 + (gapLen - scroll);
+      while (z < FAR_Z * 0.95){
+        const z1 = z, z2 = z + dashLen;
+        if (z2 > -CAMERA_PULLBACK + 0.3){
+          const p1 = project(lx, 0, Math.max(z1, -CAMERA_PULLBACK + 0.3));
+          const p2 = project(lx, 0, Math.min(z2, FAR_Z*0.95));
+          if (p1 && p2){
+            ctx.strokeStyle = 'rgba(230,230,230,0.75)';
+            ctx.lineWidth = Math.max(1.2, (1/(z1+CAMERA_PULLBACK)) * 6);
+            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+          }
+        }
+        z += dashLen + gapLen;
+      }
+    });
+  }
+  function drawBuildings(dt){
+    for (const b of buildings){
+      b.z -= dt * 0.012 * speed;
+      if (b.z <= -CAMERA_PULLBACK){
+        b.z = FAR_Z; b.side = Math.random() < 0.5 ? -1 : 1;
+        b.x = b.side * (ROAD_EDGE + 0.6 + Math.random()*3);
+        b.h = 2 + Math.random()*5; b.w = 0.8 + Math.random()*1.4;
+        b.color = ['#1a2540','#23304f','#2b1f3f','#1f2f3f','#2a2538'][Math.floor(Math.random()*5)];
+      }
+    }
+    const sorted = buildings.slice().sort((a,b) => b.z - a.z);
+    for (const b of sorted){
+      const baseP = project(b.x, 0, b.z); const topP = project(b.x, b.h, b.z);
+      if (!baseP || !topP) continue;
+      const persp = baseP.s;
+      const buildW = b.w * (W * 0.8) * persp;
+      const buildH = baseP.y - topP.y;
+      const x = baseP.x - buildW/2, y = topP.y;
+      if (y > H || x > W || x + buildW < 0) continue;
+      ctx.fillStyle = b.color; ctx.fillRect(x, y, buildW, buildH);
+      ctx.fillStyle = 'rgba(255,255,255,0.05)'; ctx.fillRect(x, y, Math.max(1, buildW*0.08), buildH);
+      if (b.windows && buildW > 12 && buildH > 20){
+        const cols = Math.max(2, Math.floor(buildW/8)), rows = Math.max(3, Math.floor(buildH/10));
+        const wW = (buildW - 4) / cols, wH = (buildH - 6) / rows;
+        for (let cc=0; cc<cols; cc++) for (let rr=0; rr<rows; rr++){
+          const lit = ((cc*7 + rr*3 + Math.floor(b.seed)) % 4) !== 0;
+          ctx.fillStyle = lit ? (((cc+rr)%5===0) ? 'rgba(255,200,120,0.9)' : 'rgba(255,230,160,0.75)') : 'rgba(40,40,60,0.6)';
+          ctx.fillRect(x + 2 + cc*wW + wW*0.15, y + 3 + rr*wH + wH*0.15, wW*0.7, wH*0.6);
+        }
+      }
+    }
+  }
+
+  function roundedRect(x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r); ctx.closePath();
+  }
+  function shade(hex, amt){
+    let c = hex.replace('#',''); if (c.length === 3) c = c.split('').map(x=>x+x).join('');
+    const num = parseInt(c, 16);
+    let r = (num >> 16) + amt, g = ((num >> 8) & 0xff) + amt, b = (num & 0xff) + amt;
+    r = Math.max(0,Math.min(255,r)); g = Math.max(0,Math.min(255,g)); b = Math.max(0,Math.min(255,b));
+    return `rgb(${r},${g},${b})`;
+  }
+
+  const CAR_WIDTH_RATIO = 0.88, CAR_HEIGHT_RATIO = 0.72;
+
+  function drawCar(o){
+    const p = project(o.x, 0, o.z); if (!p) return;
+    const persp = p.s;
+    const cw = LANE_SPACING * CAR_WIDTH_RATIO * persp * W;
+    const ch = cw * CAR_HEIGHT_RATIO;
+    ctx.save();
+    ctx.translate(p.x, p.y - ch*0.3);
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.beginPath(); ctx.ellipse(0, ch*0.4, cw*0.55, ch*0.18, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = o.color;
+    ctx.beginPath();
+    ctx.moveTo(-cw*0.42, -ch*0.3); ctx.lineTo(cw*0.42, -ch*0.3);
+    ctx.quadraticCurveTo(cw*0.5, -ch*0.3, cw*0.5, -ch*0.22);
+    ctx.lineTo(cw*0.5, ch*0.32); ctx.quadraticCurveTo(cw*0.5, ch*0.40, cw*0.42, ch*0.40);
+    ctx.lineTo(-cw*0.42, ch*0.40); ctx.quadraticCurveTo(-cw*0.5, ch*0.40, -cw*0.5, ch*0.32);
+    ctx.lineTo(-cw*0.5, -ch*0.22); ctx.quadraticCurveTo(-cw*0.5, -ch*0.3, -cw*0.42, -ch*0.3);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = shade(o.color, -25);
+    ctx.beginPath();
+    ctx.moveTo(-cw*0.35, -ch*0.7); ctx.lineTo(cw*0.35, -ch*0.7);
+    ctx.quadraticCurveTo(cw*0.4, -ch*0.65, cw*0.4, -ch*0.55);
+    ctx.lineTo(cw*0.4, -ch*0.2); ctx.lineTo(-cw*0.4, -ch*0.2);
+    ctx.lineTo(-cw*0.4, -ch*0.55); ctx.quadraticCurveTo(-cw*0.4, -ch*0.65, -cw*0.35, -ch*0.7);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(40,80,120,0.85)';
+    ctx.beginPath();
+    ctx.moveTo(-cw*0.28, -ch*0.62); ctx.lineTo(cw*0.28, -ch*0.62);
+    ctx.lineTo(cw*0.32, -ch*0.32); ctx.lineTo(-cw*0.32, -ch*0.32);
+    ctx.closePath(); ctx.fill();
+    const beam1 = ctx.createRadialGradient(-cw*0.32, -ch*0.05, 0, -cw*0.32, -ch*0.05, cw*0.3);
+    beam1.addColorStop(0, 'rgba(255,255,200,1)'); beam1.addColorStop(1, 'rgba(255,255,200,0)');
+    ctx.fillStyle = beam1; ctx.fillRect(-cw*0.6, -ch*0.3, cw*0.5, ch*0.4);
+    const beam2 = ctx.createRadialGradient(cw*0.32, -ch*0.05, 0, cw*0.32, -ch*0.05, cw*0.3);
+    beam2.addColorStop(0, 'rgba(255,255,200,1)'); beam2.addColorStop(1, 'rgba(255,255,200,0)');
+    ctx.fillStyle = beam2; ctx.fillRect(cw*0.1, -ch*0.3, cw*0.5, ch*0.4);
+    ctx.fillStyle = '#fffce0';
+    ctx.beginPath(); ctx.arc(-cw*0.32, -ch*0.05, Math.max(0.8, cw*0.05), 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cw*0.32, -ch*0.05, Math.max(0.8, cw*0.05), 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.ellipse(0, -ch*0.05, cw*0.18, ch*0.08, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#0a0a0a';
+    ctx.fillRect(-cw*0.48, ch*0.32, cw*0.18, ch*0.15); ctx.fillRect(cw*0.30, ch*0.32, cw*0.18, ch*0.15);
+    ctx.restore();
+  }
+  function drawBill(o){
+    const p = project(o.x, 0, o.z); if (!p) return;
+    const persp = p.s, tier = o.tier;
+    const w = LANE_SPACING * 0.42 * tier.sizeMult * persp * W;
+    const h = w * 0.42;
+    if (w < 3) return;
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(o.angle);
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(0, h*0.35, w*0.55, h*0.35, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = BILL_GREEN_BODY; ctx.fillRect(-w/2, -h/2, w, h);
+    if (w > 10){ ctx.strokeStyle = BILL_GREEN_ACCENT; ctx.lineWidth = Math.max(0.5, w*0.025);
+      ctx.strokeRect(-w/2 + w*0.05, -h/2 + h*0.12, w*0.90, h*0.76); }
+    if (w > 16){ ctx.fillStyle = BILL_GREEN_TEXT; ctx.font = `600 ${h*0.55}px sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(tier.label, 0, 0); }
+    ctx.restore();
+  }
+
+  // ============================================================
+  // [ALIEN HEAD] — teardrop/balloon silhouette
+  //
+  // Strategy:
+  //   1. Custom bezier silhouette: WIDE rounded cranium on top, tapering
+  //      smoothly to a pointed chin at the bottom — like a teardrop or
+  //      upside-down balloon. Matches the reference photo (greys/Roswell
+  //      style). Built from 4 bezier segments mirrored left/right so the
+  //      curve is mathematically continuous (no corners possible).
+  //   2. Eyes sit in the lower-middle, large and wraparound, with a darker
+  //      tinted "bag" ring around each socket so they look sunken like the
+  //      photo.
+  //   3. Vertical seam runs top-to-mid down the center.
+  //   4. Subtle horizontal compression when turned for foreshortening.
+  // ============================================================
+  function drawAlienHead(opts){
+    const { w, h, turn } = opts;
+    const t = Math.max(-1, Math.min(1, turn));
+    const absT = Math.abs(t);
+    const sign = t < 0 ? -1 : 1;
+
+    ctx.save();
+    ctx.translate(opts.cx, opts.cy);
+
+    // Balloon / inverted-pear silhouette dimensions.
+    // skullH is HALF the head height (top is -skullH, chin tip is +skullH).
+    // Width compresses with turn — gives a real "head turning" feel rather
+    // than just features sliding around.
+    const skullW = w * 0.74 * (1 - absT * 0.30);
+    const skullH = w * 0.92;
+
+    // Key shape points. Widest part sits high (upper third). The bottom is
+    // ROUNDED, not pointed — narrow but blunt like a real chin.
+    const topY      = -skullH;            // top of dome
+    const widestY   = -skullH * 0.30;     // widest cheekbone band
+    const widestX   =  skullW;
+    const cheekY    =  skullH * 0.20;     // start of taper inward
+    const cheekX    =  skullW * 0.72;
+    const jawY      =  skullH * 0.65;     // narrowing
+    const jawX      =  skullW * 0.32;
+    const chinY     =  skullH;            // rounded bottom
+    const chinX     =  skullW * 0.13;     // bottom is narrow but blunt-rounded
+
+    function buildSkullPath(){
+      ctx.beginPath();
+      ctx.moveTo(0, topY);
+      // RIGHT SIDE
+      ctx.bezierCurveTo(
+        skullW * 0.92, topY,
+        widestX,       widestY - skullH * 0.28,
+        widestX,       widestY
+      );
+      ctx.bezierCurveTo(
+        widestX,                widestY + skullH * 0.28,
+        cheekX + skullW * 0.10, cheekY - skullH * 0.05,
+        cheekX,                 cheekY
+      );
+      ctx.bezierCurveTo(
+        cheekX - skullW * 0.10, cheekY + skullH * 0.18,
+        jawX + skullW * 0.06,   jawY - skullH * 0.05,
+        jawX,                   jawY
+      );
+      ctx.bezierCurveTo(
+        jawX - skullW * 0.05,   jawY + skullH * 0.14,
+        chinX + skullW * 0.04,  chinY - skullH * 0.02,
+        chinX,                  chinY
+      );
+      // Across the chin — pronounced downward bulge for a real chin
+      ctx.quadraticCurveTo(0, chinY + skullH * 0.07, -chinX, chinY);
+      // LEFT SIDE mirrored
+      ctx.bezierCurveTo(
+        -(chinX + skullW * 0.04), chinY - skullH * 0.02,
+        -(jawX - skullW * 0.05),  jawY + skullH * 0.14,
+        -jawX,                    jawY
+      );
+      ctx.bezierCurveTo(
+        -(jawX + skullW * 0.06),  jawY - skullH * 0.05,
+        -(cheekX - skullW * 0.10),cheekY + skullH * 0.18,
+        -cheekX,                  cheekY
+      );
+      ctx.bezierCurveTo(
+        -(cheekX + skullW * 0.10),cheekY - skullH * 0.05,
+        -widestX,                 widestY + skullH * 0.28,
+        -widestX,                 widestY
+      );
+      ctx.bezierCurveTo(
+        -widestX,                 widestY - skullH * 0.28,
+        -skullW * 0.92,           topY,
+        0,                        topY
+      );
+      ctx.closePath();
+    }
+
+    // Skin gradient — warm tan, lighter on top dome, darker toward chin
+    const skinLight = '#e8b888';
+    const skinMid   = '#c98e5a';
+    const skinDark  = '#7a4a28';
+    const grad = ctx.createLinearGradient(-skullW*0.3*sign + skullW*0.2*sign, topY, 0, chinY);
+    grad.addColorStop(0, skinLight);
+    grad.addColorStop(0.5, skinMid);
+    grad.addColorStop(1, skinDark);
+
+    // ---- THE ENTIRE HEAD SILHOUETTE: one continuous teardrop ----
+    buildSkullPath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Helper: re-clip to the teardrop for layered effects
+    function clipSkull(){
+      buildSkullPath();
+      ctx.clip();
+    }
+
+    // Side shadow — provides the soft cheek-bulge dimensionality when the
+    // alien is facing AWAY (turn ~ 0, back of head). Fades out completely
+    // as he turns so the profile view is clean.
+    const shadowAmount = Math.max(0, 1 - absT / 0.30);
+    if (shadowAmount > 0){
+      ctx.save();
+      clipSkull();
+      // At turn=0 we don't have a "side" — use symmetric darkening at the
+      // outer edges to create soft cheek bulges. The gradient runs from
+      // dark at the rim to light in the middle.
+      const sideDarken = ctx.createRadialGradient(0, 0, skullW * 0.20, 0, 0, skullW * 1.05);
+      sideDarken.addColorStop(0, 'rgba(60,30,15,0)');
+      sideDarken.addColorStop(0.55, 'rgba(60,30,15,0)');
+      sideDarken.addColorStop(1, `rgba(60,30,15,${0.32 * shadowAmount})`);
+      ctx.fillStyle = sideDarken;
+      ctx.fillRect(-skullW*1.2, -skullH*1.1, skullW*2.4, skullH*2.2);
+      ctx.restore();
+    }
+
+    // Subtle center seam — only on the upper third, fades when turned
+    const seamVisibility = Math.max(0, 1 - absT / 0.25);
+    if (seamVisibility > 0){
+      ctx.save();
+      clipSkull();
+      const seamTopY = -skullH * 0.85;
+      const seamBotY = -skullH * 0.05;  // ends near the brow line
+      const seamW = skullW * 0.025;
+      ctx.globalAlpha = 0.16 * seamVisibility;
+      const seamGrad = ctx.createLinearGradient(-seamW, 0, seamW, 0);
+      seamGrad.addColorStop(0, 'rgba(90,50,25,0)');
+      seamGrad.addColorStop(0.5, 'rgba(70,35,15,1)');
+      seamGrad.addColorStop(1, 'rgba(90,50,25,0)');
+      ctx.fillStyle = seamGrad;
+      ctx.fillRect(-seamW, seamTopY, seamW * 2, seamBotY - seamTopY);
+      ctx.globalAlpha = 0.20 * seamVisibility;
+      ctx.strokeStyle = 'rgba(70,35,15,1)';
+      ctx.lineWidth = Math.max(0.5, w * 0.006);
+      ctx.beginPath();
+      ctx.moveTo(0, seamTopY + (seamBotY - seamTopY) * 0.08);
+      ctx.lineTo(0, seamTopY + (seamBotY - seamTopY) * 0.85);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+    }
+
+    // Dome highlight — broad warm highlight on the upper cranium
+    ctx.save();
+    clipSkull();
+    const highlightCX = sign * skullW * 0.05;
+    const highlightCY = -skullH * 0.55;
+    const domeHighlight = ctx.createRadialGradient(highlightCX, highlightCY - skullH * 0.05, 0, highlightCX, highlightCY, skullW * 0.75);
+    domeHighlight.addColorStop(0, 'rgba(255,225,180,0.55)');
+    domeHighlight.addColorStop(0.5, 'rgba(255,210,160,0.20)');
+    domeHighlight.addColorStop(1, 'rgba(255,210,160,0)');
+    ctx.fillStyle = domeHighlight;
+    ctx.fillRect(-skullW*1.2, -skullH*1.1, skullW*2.4, skullH*1.4);
+    ctx.restore();
+
+    // ---- BIG ALMOND EYE (with sunken socket bag) ----
+    // The alien faces AWAY from the camera by default (we see the back of
+    // his head). When he turns, ONE eye comes into view on the side he's
+    // turning toward — the far eye stays hidden behind the cranium.
+    // Eye fades in as the turn progresses.
+    const eyeVisibility = Math.max(0, Math.min(1, (absT - 0.05) / 0.30));
+    if (eyeVisibility > 0){
+      const eyeW = w * 0.42;                // wider — more elongated almond
+      const eyeH = h * 0.22;                // shorter — flatter, more horizontal
+      const eyeX = sign * skullW * 0.42;    // further out toward the side of the head
+      const eyeY = skullH * 0.02;           // lower on the face, away from cranium
+      // Sharper outward tilt — eye corner sweeps up toward the temple.
+      const baseTilt = 0.42;
+
+      ctx.save();
+      clipSkull();
+      ctx.translate(eyeX, eyeY);
+      ctx.rotate(sign * baseTilt);
+      // Mirror so the SHARP outer point lands toward the nose/center,
+      // and the rounded "inner" corner lands toward the temple.
+      if (sign < 0) ctx.scale(-1, 1);
+      // Vertical flip so the pointy tip sweeps UP (toward the cranium)
+      // instead of down toward the mouth.
+      ctx.scale(1, -1);
+      ctx.globalAlpha = eyeVisibility;
+      const innerX = -eyeW * 0.42;
+      const outerX =  eyeW * 0.62;          // pulled out toward temple
+
+      // Soft dark socket halo — kept tight to the eye.
+      const bagGrad = ctx.createRadialGradient(eyeW*0.15, 0, eyeW*0.10, eyeW*0.15, 0, eyeW*0.78);
+      bagGrad.addColorStop(0,   'rgba(35,15,5,0.78)');
+      bagGrad.addColorStop(0.50,'rgba(50,22,8,0.38)');
+      bagGrad.addColorStop(1,   'rgba(50,22,8,0)');
+      ctx.fillStyle = bagGrad;
+      ctx.beginPath();
+      ctx.ellipse(eyeW*0.10, 0, eyeW*0.85, eyeH*0.78, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Tight dark rim hugging the almond — sharp pointed temple.
+      ctx.fillStyle = 'rgba(20,8,2,0.65)';
+      ctx.beginPath();
+      ctx.moveTo(innerX * 1.10, eyeH * 0.02);
+      ctx.bezierCurveTo(
+        innerX * 0.55, -eyeH * 0.65,
+        outerX * 0.55, -eyeH * 0.78,
+        outerX * 1.35, -eyeH * 0.42
+      );
+      ctx.lineTo(outerX * 1.50, -eyeH * 0.10);
+      ctx.bezierCurveTo(
+        outerX * 1.25,  eyeH * 0.18,
+        outerX * 0.50,  eyeH * 0.70,
+        innerX * 1.10,  eyeH * 0.02
+      );
+      ctx.closePath();
+      ctx.fill();
+
+      // The almond eye, black & glossy — sharp temple point.
+      const eyeGrad = ctx.createRadialGradient(-eyeW*0.10, -eyeH*0.10, 0, 0, 0, eyeW*0.60);
+      eyeGrad.addColorStop(0, '#1a2030');
+      eyeGrad.addColorStop(0.7, '#050810');
+      eyeGrad.addColorStop(1, '#000000');
+      ctx.fillStyle = eyeGrad;
+      ctx.beginPath();
+      ctx.moveTo(innerX * 0.95, 0);
+      ctx.bezierCurveTo(
+        innerX * 0.50, -eyeH * 0.55,
+        outerX * 0.50, -eyeH * 0.68,
+        outerX * 1.20, -eyeH * 0.32
+      );
+      ctx.lineTo(outerX * 1.38, -eyeH * 0.05);
+      ctx.bezierCurveTo(
+        outerX * 1.15,  eyeH * 0.15,
+        outerX * 0.45,  eyeH * 0.60,
+        innerX * 0.95,  0
+      );
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // ---- NOSE BUMP (silhouette) ----
+    // Small skin-colored bump on the silhouette of the face, visible only
+    // when meaningfully turned. Sits between the eye and the mouth on the
+    // forward (camera-facing) side.
+    const noseVisibility = Math.max(0, Math.min(1, (absT - 0.30) / 0.30));
+    if (noseVisibility > 0){
+      ctx.save();
+      clipSkull();
+      ctx.globalAlpha = noseVisibility;
+      const noseY = skullH * 0.15;
+      // Sit just inside the silhouette edge — at this y the head half-width
+      // is about skullW * 0.74. Push slightly inward so it stays on face.
+      const noseBaseX = sign * skullW * 0.62;
+      const noseShade = ctx.createRadialGradient(noseBaseX * 0.9, noseY, 0, noseBaseX * 0.9, noseY, skullW * 0.25);
+      noseShade.addColorStop(0, 'rgba(60,30,15,0.25)');
+      noseShade.addColorStop(1, 'rgba(60,30,15,0)');
+      ctx.fillStyle = noseShade;
+      ctx.beginPath();
+      ctx.ellipse(noseBaseX, noseY, skullW * 0.12, skullH * 0.10, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ---- NOSTRIL ----
+    const nostrilVisibility = Math.max(0, Math.min(1, (absT - 0.45) / 0.35));
+    if (nostrilVisibility > 0){
+      ctx.save();
+      clipSkull();
+      ctx.globalAlpha = 0.55 * nostrilVisibility;
+      const nostrilX = sign * skullW * 0.55;
+      const nostrilY = skullH * 0.22;
+      const nostrilW = w * 0.018;
+      const nostrilH = h * 0.012;
+      ctx.fillStyle = '#1a0808';
+      ctx.beginPath();
+      ctx.ellipse(nostrilX, nostrilY, nostrilW, nostrilH, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ---- MOUTH ----
+    // Open mouth hole sitting right on the silhouette edge.
+    const mouthVisibility = Math.max(0, Math.min(1, (absT - 0.40) / 0.40));
+    if (mouthVisibility > 0){
+      // Sit right on the silhouette edge — at this y the half-width is
+      // about skullW * 0.46. Place mouth center there so the dark hole
+      // straddles the head's outline.
+      const mouthX = sign * skullW * 0.46;
+      const mouthY = skullH * 0.48;
+      const mouthW = w * 0.060 * (0.7 + mouthVisibility * 0.4);
+      const mouthH = h * 0.055 * (0.6 + mouthVisibility * 0.6);   // more open
+      ctx.save();
+      clipSkull();
+      ctx.translate(mouthX, mouthY);
+      ctx.globalAlpha = mouthVisibility;
+      // Soft skin shadow around the mouth (inside skull)
+      ctx.fillStyle = 'rgba(90,45,20,0.40)';
+      ctx.beginPath(); ctx.ellipse(0, 0, mouthW*1.2, mouthH*1.4, 0, 0, Math.PI*2); ctx.fill();
+      // The open mouth hole
+      const mouthGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, mouthW);
+      mouthGrad.addColorStop(0, '#0a0404'); mouthGrad.addColorStop(1, '#2a1208');
+      ctx.fillStyle = mouthGrad;
+      ctx.beginPath(); ctx.ellipse(0, 0, mouthW, mouthH, 0, 0, Math.PI*2); ctx.fill();
+      // Subtle lower-lip highlight
+      ctx.fillStyle = 'rgba(255,200,140,0.18)';
+      ctx.beginPath(); ctx.ellipse(0, mouthH*0.75, mouthW*0.6, mouthH*0.20, 0, 0, Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  // ---- [SHIP] · saucer + head placement ----
+  function drawShip(){
+    const p = project(shipX, 0.15, SHIP_Z); if (!p) return;
+    const persp = p.s;
+    const W1 = LANE_SPACING * 0.42 * persp * W;
+    const H1 = W1 * 0.26;
+    const baseX = p.x + (Math.random()-0.5)*shake, baseY = p.y, bk = bank;
+    ctx.save();
+    ctx.translate(baseX, baseY);
+    ctx.rotate(bk * 0.16);
+    const glow = ctx.createRadialGradient(0, H1*0.4, 0, 0, H1*0.4, W1*0.9);
+    glow.addColorStop(0, 'rgba(120,200,255,0.55)'); glow.addColorStop(0.6, 'rgba(80,120,255,0.15)'); glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow; ctx.fillRect(-W1*1.2, -H1, W1*2.4, H1*3);
+    const bodyGrad = ctx.createLinearGradient(0, -H1, 0, H1);
+    bodyGrad.addColorStop(0, '#b8c3d6'); bodyGrad.addColorStop(0.5, '#7a869e'); bodyGrad.addColorStop(1, '#3a4458');
+    ctx.fillStyle = bodyGrad;
+    ctx.beginPath(); ctx.ellipse(0, H1*0.2, W1, H1, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#dbe4f5'; ctx.lineWidth = Math.max(1, W1*0.02);
+    ctx.beginPath(); ctx.ellipse(0, H1*0.2, W1, H1, 0, Math.PI*1.05, Math.PI*1.95); ctx.stroke();
+    const t = performance.now()*0.003;
+    for (let i=0;i<7;i++){
+      const a = (i/7)*Math.PI + Math.PI*1.1;
+      const lx = Math.cos(a)*W1*0.85, ly = Math.sin(a)*H1*0.85 + H1*0.2;
+      ctx.fillStyle = (Math.sin(t*4 + i) > 0) ? '#ffd24a' : '#ff7a7a';
+      ctx.beginPath(); ctx.arc(lx, ly, Math.max(1.2, W1*0.03), 0, Math.PI*2); ctx.fill();
+    }
+    const hatchW = W1 * 0.28, hatchH = H1 * 0.32, hatchY = -H1 * 0.05;
+    ctx.fillStyle = '#0a0a18';
+    ctx.beginPath(); ctx.ellipse(0, hatchY, hatchW, hatchH, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#c0cad8'; ctx.lineWidth = Math.max(1, W1*0.025);
+    ctx.beginPath(); ctx.ellipse(0, hatchY, hatchW, hatchH, 0, 0, Math.PI*2); ctx.stroke();
+    ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = Math.max(0.5, W1*0.012);
+    ctx.beginPath(); ctx.ellipse(0, hatchY, hatchW*0.92, hatchH*0.85, 0, 0, Math.PI*2); ctx.stroke();
+    // ---- HEAD + NECK ----
+    // Smaller, more compact balloon-head with a short neck that barely
+    // peeks out of the cockpit hatch.
+    const headW = W1 * 0.55;                     // 30% smaller than before
+    const headH = headW * 1.05;
+    const hatchTopY     = hatchY - hatchH;
+    const skullHActual  = headW * 0.92 + headW * 0.92 * 0.07;
+    // The head sits LOW so the chin is right at the hatch rim and the
+    // neck is mostly inside the cockpit — like the alien is emerging
+    // from it instead of floating on top.
+    const headDrop      = hatchH * 1.05;
+    const neckLength    = H1 * 0.02;
+    const headCY        = hatchTopY - neckLength - skullHActual + headDrop;
+
+    // Draw the neck stub first so the head overlaps the top of it cleanly.
+    {
+      const neckTopW = headW * 0.18;
+      const neckBotW = headW * 0.26;
+      const neckTopY = headCY + skullHActual - headW * 0.02;
+      const neckBotY = hatchTopY + hatchH * 1.40;   // dip way down into the hatch interior
+
+      ctx.save();
+      // Clip region: everything above the hatch top, PLUS the inside of the
+      // hatch ellipse. The neck can show above the rim or descending into
+      // the dark hole, but not below/outside the hatch on the ship body.
+      ctx.beginPath();
+      // Rectangle covering everything above the hatch top
+      ctx.rect(-W1 * 2, -H1 * 8, W1 * 4, (hatchTopY) - (-H1 * 8));
+      // Hatch ellipse interior
+      ctx.moveTo(hatchW, hatchY);
+      ctx.ellipse(0, hatchY, hatchW, hatchH, 0, 0, Math.PI * 2);
+      ctx.clip('nonzero');
+
+      const neckGrad = ctx.createLinearGradient(0, neckTopY, 0, neckBotY);
+      neckGrad.addColorStop(0,    '#a87545');
+      neckGrad.addColorStop(0.45, '#5a3418');
+      neckGrad.addColorStop(1,    '#1a0e06');     // fades to almost-black inside the cockpit
+      ctx.fillStyle = neckGrad;
+      ctx.beginPath();
+      ctx.moveTo(-neckTopW, neckTopY);
+      ctx.lineTo( neckTopW, neckTopY);
+      ctx.quadraticCurveTo(neckBotW * 1.05, (neckTopY + neckBotY) * 0.5, neckBotW, neckBotY);
+      ctx.lineTo(-neckBotW, neckBotY);
+      ctx.quadraticCurveTo(-neckBotW * 1.05, (neckTopY + neckBotY) * 0.5, -neckTopW, neckTopY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Faint shadow under the jaw where the neck meets the head
+      ctx.fillStyle = 'rgba(40,18,8,0.35)';
+      ctx.beginPath();
+      ctx.ellipse(0, neckTopY + headW * 0.005, neckTopW * 1.4, headW * 0.022, 0, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    drawAlienHead({ cx: 0, cy: headCY, w: headW, h: headH, turn: headTurn });
+    for (let i=-1;i<=1;i+=2){
+      const ex = i * W1*0.55, ey = H1*0.6;
+      const flameGrad = ctx.createRadialGradient(ex, ey, 0, ex, ey, W1*0.3);
+      flameGrad.addColorStop(0, 'rgba(150,220,255,0.9)'); flameGrad.addColorStop(0.5, 'rgba(80,140,255,0.5)'); flameGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = flameGrad;
+      ctx.beginPath(); ctx.arc(ex, ey, W1*0.18 + Math.sin(t*15+i)*W1*0.03, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function spawnParticle(x, y, color, count, spread){
+    for (let i=0;i<count;i++) particles.push({ x, y, vx: (Math.random()-0.5)*spread, vy: (Math.random()-0.5)*spread - 1, life: 1, color });
+  }
+  function updateParticles(dt){
+    for (let i=particles.length-1;i>=0;i--){
+      const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.15;
+      p.life -= dt*0.003; if (p.life <= 0) particles.splice(i,1);
+    }
+  }
+  function drawParticles(){
+    for (const p of particles){
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.fillStyle = p.color; ctx.fillRect(p.x, p.y, 3, 3);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function showTierPopup(tier){
+    popupTier.textContent = tier.label + ' BILLS';
+    tierPopup.classList.add('show');
+    popupHideTimer = 2500;
+  }
+
+  // ---- [HEAD TURN] · animation timing ----
+  function updateHeadTurn(dt){
+    headTurnTimer -= dt; headHoldTimer -= dt;
+    if (headTurnTimer <= 0){
+      // Every cycle is a deterministic turn: pick a random side, hold for
+      // ~1s, then return to center. Next turn fires every 6 seconds.
+      const dir = Math.random() < 0.5 ? -1 : 1;
+      // He only turns enough to show his eye and mouth — not a full profile.
+      headTurnTarget = dir * (0.55 + Math.random() * 0.15);
+      headHoldTimer = 1000;
+      headTurnsDone++;
+      // First turn at 5s, then never again.
+      headTurnTimer = Infinity;
+    }
+    if (headHoldTimer <= 0 && headTurnTarget !== 0) headTurnTarget = 0;
+    headTurn += (headTurnTarget - headTurn) * Math.min(1, dt * 0.006);
+  }
+
+  for (let i=0;i<60;i++) buildings.push(makeBuilding(Math.random() * FAR_Z));
+
+  let last = performance.now();
+  function loop(now){
+    const dt = Math.min(40, now - last); last = now;
+    drawSky(); drawBuildings(dt); drawRoad();
+    if (running){
+      const targetX = LANES_X[laneIndex]; const dx = targetX - shipX;
+      shipX += dx * Math.min(0.22, dt * 0.018);
+      bank += (Math.sign(dx) * Math.min(1, Math.abs(dx)*1.5) - bank) * 0.12;
+      distance += dt * speed;
+      const blendT_raw = Math.max(0, Math.min(1, (distance - 6000) / 18000));
+      const blendT = blendT_raw * blendT_raw * (3 - 2 * blendT_raw);
+      // ---- [SPEED CURVE] ----
+      const easyComp = 0.55 * Math.log10(1 + distance/10000);
+      const hardComp = 2.6 * Math.log10(1 + distance/2200);
+      speed = 1 + easyComp * (1 - blendT) + hardComp * blendT;
+      if (speed > topSpeed) topSpeed = speed;
+      let curIdx = 0;
+      for (let i=0;i<BILL_TIERS.length;i++) if (distance >= BILL_TIERS[i].minDist) curIdx = i;
+      if (curIdx > lastTierIndex){ showTierPopup(BILL_TIERS[curIdx]); lastTierIndex = curIdx; }
+      if (popupHideTimer > 0){
+        popupHideTimer -= dt;
+        if (popupHideTimer <= 0) tierPopup.classList.remove('show');
+      }
+      carSpawnCD -= dt * speed;
+      if (carSpawnCD <= 0){ spawnCar(); const baseInterval = 1700, minInterval = 600;
+        const reduction = Math.min(baseInterval - minInterval, distance * 0.006);
+        carSpawnCD = baseInterval - reduction + Math.random()*700; }
+      for (let i=cars.length-1;i>=0;i--){
+        const c = cars[i]; c.z -= dt * 0.015 * speed;
+        if (Math.abs(c.z - SHIP_Z) < 0.6 && !c.hit){
+          if (c.lane === laneIndex){ c.hit = true; shake = 30;
+            const p = project(c.x, 0, c.z);
+            if (p){ spawnParticle(p.x, p.y, '#ff8060', 40, 16); spawnParticle(p.x, p.y, '#ffcc60', 24, 12); spawnParticle(p.x, p.y, '#ffffff', 16, 8); }
+            gameOver(); } }
+        if (c.z < -CAMERA_PULLBACK - 0.5) cars.splice(i,1);
+      }
+      streamCD -= dt;
+      if (streamCD <= 0){
+        if (streams.length === 0 || streams.every(s => s.spawned >= s.count)) streams.push(spawnStream());
+        streamCD = 2400 + Math.random()*1600;
+      }
+      for (let si=streams.length-1; si>=0; si--){
+        const st = streams[si]; st.spawnCD -= dt;
+        if (st.spawned < st.count && st.spawnCD <= 0){
+          const laneIdx = pickLaneForBill(st.lastLane); st.lastLane = laneIdx;
+          const angle = (Math.random() - 0.5) * 0.9;
+          bills.push({ lane: laneIdx, x: LANES_X[laneIdx], z: FAR_Z, hit: false, _stream: st, tier: st.tier, angle });
+          st.spawned++; st.spawnCD = 140 + Math.random()*40;
+        }
+        if (st.spawned >= st.count){ const stillAlive = bills.some(b => b._stream === st); if (!stillAlive) streams.splice(si,1); }
+      }
+      for (let i=bills.length-1;i>=0;i--){
+        const b = bills[i]; b.z -= dt * 0.016 * speed;
+        if (Math.abs(b.z - SHIP_Z) < 0.6 && !b.hit){
+          if (b.lane === laneIndex){ b.hit = true; score += b.tier.value;
+            const p = project(b.x, 0, b.z); if (p) spawnParticle(p.x, p.y, '#7be09a', 10, 5); } }
+        if (b.z < -CAMERA_PULLBACK - 0.5 || b.hit) bills.splice(i,1);
+      }
+      shake *= 0.85; updateParticles(dt); updateHeadTurn(dt);
+      scoreEl.textContent = '$' + score.toLocaleString(); speedEl.textContent = speed.toFixed(2) + '×';
+      tierEl.textContent = currentBillTier().label;
+    } else { updateHeadTurn(dt); }
+    const drawables = [];
+    for (const c of cars) if (!c.hit) drawables.push({kind:'car', z:c.z, ref:c});
+    for (const b of bills) if (!b.hit) drawables.push({kind:'bill', z:b.z, ref:b});
+    drawables.sort((a,b) => b.z - a.z);
+    for (const d of drawables){ if (d.kind === 'car') drawCar(d.ref); else drawBill(d.ref); }
+    drawParticles(); drawShip();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  }
+  tryInit();
+})();
+</script>
+</body>
+</html>
