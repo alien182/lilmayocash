@@ -298,8 +298,8 @@
       <div class="ne-headline">CONGRATZ!</div>
       <div class="ne-rank-line" id="ne-headline-rank"></div>
       <div class="ne-desc">
-        <div class="ne-desc-line">Flex your name/@ on the leaderboard</div>
-        <div class="ne-desc-prize">Prize?</div>
+        <div class="ne-desc-line">Get your Name/@ on the Leaderboard</div>
+        <div class="ne-desc-prize">Airdrop $MAYO</div>
       </div>
       <div class="ne-stats">
         <div><span class="ne-stats-label">CASH</span><span id="ne-cash" class="ne-stats-val">$0</span></div>
@@ -348,12 +348,12 @@
   // these values publicly — they identify your project, not authorize it.
   // Get it from Firebase Console → Project Settings → Your apps → Web app.
   const firebaseConfig = {
-  apiKey: "AIzaSyC_wcz5WprXQ4Q__-mBgdYBfp5Tta9O5is",
-  authDomain: "collect-9c6c9.firebaseapp.com",
-  projectId: "collect-9c6c9",
-  storageBucket: "collect-9c6c9.firebasestorage.app",
-  messagingSenderId: "51162547067",
-  appId: "1:51162547067:web:d41ad26a4dbf5d984c73de",
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // If your Cloud Functions are in a non-default region, set it here.
@@ -584,7 +584,7 @@ function openNameEntry(opts){
     submitBtn.textContent = 'SAVE';
     const desc = document.querySelector('.ne-desc');
     if (desc){
-      desc.innerHTML = '<div class="ne-desc-line">Flex your name/@ on the leaderboard</div><div class="ne-desc-prize">Prize?</div>';
+      desc.innerHTML = '<div class="ne-desc-line">Get your Name/@ on the Leaderboard</div><div class="ne-desc-prize">Airdrop $MAYO</div>';
       desc.style.color = '';
       desc.style.fontStyle = '';
     }
