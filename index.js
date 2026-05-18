@@ -31,15 +31,20 @@ setGlobalOptions({ region: 'us-central1', maxInstances: 10 });
 // the game's tier/speed curves, revisit these numbers.
 
 // Highest plausible cash per second a player could reasonably collect.
-// Calibrate this generously — too tight rejects legit scores; too loose
-// lets cheaters through. Start permissive, watch the data, tighten later.
-const MAX_CASH_PER_SECOND = 250;
+// Set very loose so legit fast runs at high speed never get rejected.
+// Cheater filter relies on the runId + duration check, not this number.
+const MAX_CASH_PER_SECOND = 1000;
 
 // Absolute ceilings — anything beyond these is obviously bogus.
-const ABS_MAX_CASH      = 5_000_000;
-const ABS_MAX_TOP_SPEED = 5.0;
-const ABS_MIN_RUN_MS    = 1_500;       // 1.5 s minimum run duration
-const ABS_MAX_RUN_MS    = 60 * 60_000; // 1 h maximum (anti-AFK-token abuse)
+// Configured very loose per design: real player runs should never hit these,
+// they're just here as the final "no way this is real" sanity floor.
+//   ABS_MAX_CASH      — total cash for one run. Set high so big runs pass.
+//   ABS_MAX_TOP_SPEED — peak speed multiplier. Real peak in extreme runs is
+//                       ~8-10×; 50 is just a "definitely not real" ceiling.
+const ABS_MAX_CASH      = 100_000;
+const ABS_MAX_TOP_SPEED = 50;
+const ABS_MIN_RUN_MS    = 1_500;
+const ABS_MAX_RUN_MS    = 60 * 60_000;
 
 // Rate limits.
 const START_RUN_COOLDOWN_MS = 3_000;   // one startRun per UID per 3 s
