@@ -348,12 +348,12 @@
   // these values publicly — they identify your project, not authorize it.
   // Get it from Firebase Console → Project Settings → Your apps → Web app.
   const firebaseConfig = {
-  apiKey: "AIzaSyC_wcz5WprXQ4Q__-mBgdYBfp5Tta9O5is",
-  authDomain: "collect-9c6c9.firebaseapp.com",
-  projectId: "collect-9c6c9",
-  storageBucket: "collect-9c6c9.firebasestorage.app",
-  messagingSenderId: "51162547067",
-  appId: "1:51162547067:web:d41ad26a4dbf5d984c73de",
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // If your Cloud Functions are in a non-default region, set it here.
@@ -386,6 +386,7 @@
 // FILE NAVIGATION — JUMP HERE WITH CTRL-F
 // ============================================================
 //   [LEADERBOARD]   The Firebase-backed module + UI renderer
+//   [AUDIO]         Procedural sound effects (tier-up chime, crash thud)
 //   [NAME ENTRY]    The Congratz! pop-up modal (background: images/congratz-bg.png)
 //   [GAME INIT]     Main game IIFE starts here
 //   [ALIEN HEAD]    drawAlienHead() — silhouette + eyes + mouth
@@ -550,6 +551,105 @@ function escapeHtml(s){
 
 // Render on load
 document.addEventListener('DOMContentLoaded', () => renderLeaderboard());
+
+// ============================================================
+// [AUDIO] · Procedural sound effects using the Web Audio API.
+// No assets needed — sounds are synthesized in-browser.
+//
+// Two public functions used by the game:
+//   playTierUpSound()  — short pleasant chime when a new bill tier unlocks
+//   playCrashSound()   — short thuddy crash on game over
+//
+// Audio is lazy-initialized on first user interaction (clicking PLAY),
+// because browsers (especially iOS Safari) block any sound until the
+// user explicitly interacts with the page.
+// ============================================================
+const GameAudio = (function(){
+  let ctx = null;
+  let soundOn = true;     // hook for a future mute button
+  let initialized = false;
+
+  function init(){
+    if (initialized) return;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      ctx = new AC();
+      initialized = true;
+    } catch (e){ /* silent fail — game still works without sound */ }
+  }
+
+  // Play a short tone with an envelope. freq in Hz, dur in seconds.
+  function tone(freq, dur, opts){
+    if (!soundOn || !ctx) return;
+    opts = opts || {};
+    const type    = opts.type    || 'sine';
+    const gain    = opts.gain    || 0.18;
+    const attack  = opts.attack  || 0.005;
+    const release = opts.release || dur * 0.7;
+    const detune  = opts.detune  || 0;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const g   = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    osc.detune.value = detune;
+    osc.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearTimeConstant && (g.gain.linearTimeConstant = 0.001);
+    g.gain.linearRampToValueAtTime(gain, now + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + attack + release);
+    osc.start(now);
+    osc.stop(now + attack + release + 0.05);
+  }
+
+  // Quick filtered-noise burst for the crash sound.
+  function noiseBurst(dur, opts){
+    if (!soundOn || !ctx) return;
+    opts = opts || {};
+    const gain   = opts.gain   || 0.30;
+    const cutoff = opts.cutoff || 800;
+    const now = ctx.currentTime;
+    const bufferSize = Math.floor(ctx.sampleRate * dur);
+    const buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = cutoff;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(gain, now);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    src.connect(filter); filter.connect(g); g.connect(ctx.destination);
+    src.start(now); src.stop(now + dur + 0.05);
+  }
+
+  function playTierUpSound(){
+    if (!ctx) init();
+    if (!ctx) return;
+    // A clean two-note ascending chime — short and satisfying.
+    tone(880,  0.08, { type: 'triangle', gain: 0.16, release: 0.10 });
+    setTimeout(() => tone(1320, 0.14, { type: 'triangle', gain: 0.18, release: 0.20 }), 70);
+  }
+  function playCrashSound(){
+    if (!ctx) init();
+    if (!ctx) return;
+    // A low thud + a short noise burst — feels impactful but not jarring.
+    tone(80,  0.18, { type: 'sine',     gain: 0.40, release: 0.18 });
+    tone(55,  0.30, { type: 'triangle', gain: 0.25, release: 0.30 });
+    noiseBurst(0.20, { gain: 0.20, cutoff: 500 });
+  }
+
+  function setMuted(m){ soundOn = !m; }
+  function isMuted(){ return !soundOn; }
+  return { init, playTierUpSound, playCrashSound, setMuted, isMuted };
+})();
+// Expose so the game IIFE below can call them.
+window.playTierUpSound = GameAudio.playTierUpSound;
+window.playCrashSound  = GameAudio.playCrashSound;
+window.GameAudio = GameAudio;
 
 // ============================================================
 // [NAME ENTRY] · Modal controller for the Congratz! pop-up.
@@ -778,6 +878,9 @@ function openNameEntry(opts){
   }
   // ---- [START/RESET] · game lifecycle ----
   function start(){
+    // Browsers gate audio until a user interaction. PLAY is that interaction —
+    // initializing the audio context here makes sound work for the rest of the run.
+    try { window.GameAudio && window.GameAudio.init(); } catch (e){}
     // Fire startRun in the background — don't make the player wait on the network.
     // currentRunId fills in when the Cloud Function returns. If the player
     // crashes before it returns (or it fails entirely), the score just isn't
@@ -1474,7 +1577,11 @@ function openNameEntry(opts){
       if (speed > topSpeed) topSpeed = speed;
       let curIdx = 0;
       for (let i=0;i<BILL_TIERS.length;i++) if (distance >= BILL_TIERS[i].minDist) curIdx = i;
-      if (curIdx > lastTierIndex){ showTierPopup(BILL_TIERS[curIdx]); lastTierIndex = curIdx; }
+      if (curIdx > lastTierIndex){
+        showTierPopup(BILL_TIERS[curIdx]);
+        playTierUpSound();
+        lastTierIndex = curIdx;
+      }
       if (popupHideTimer > 0){
         popupHideTimer -= dt;
         if (popupHideTimer <= 0) tierPopup.classList.remove('show');
@@ -1484,11 +1591,21 @@ function openNameEntry(opts){
         const reduction = Math.min(baseInterval - minInterval, distance * 0.006);
         carSpawnCD = baseInterval - reduction + Math.random()*700; }
       for (let i=cars.length-1;i>=0;i--){
-        const c = cars[i]; c.z -= dt * 0.015 * speed;
-        if (Math.abs(c.z - SHIP_Z) < 0.6 && !c.hit){
+        const c = cars[i];
+        const oldZ = c.z;
+        c.z -= dt * 0.015 * speed;
+        // Swept collision: a car hits us this frame if EITHER it's currently
+        // inside the hit zone (the original near-check) OR it crossed the ship's
+        // z-plane during this frame (high-speed tunneling case). Lane check is
+        // unchanged so cars in other lanes never collide — players can still
+        // thread between cars in different lanes at any speed.
+        const insideHitZone = Math.abs(c.z - SHIP_Z) < 0.6;
+        const crossedShipZ  = (oldZ - SHIP_Z) * (c.z - SHIP_Z) <= 0;
+        if (!c.hit && (insideHitZone || crossedShipZ)){
           if (c.lane === laneIndex){ c.hit = true; shake = 30;
             const p = project(c.x, 0, c.z);
             if (p){ spawnParticle(p.x, p.y, '#ff8060', 40, 16); spawnParticle(p.x, p.y, '#ffcc60', 24, 12); spawnParticle(p.x, p.y, '#ffffff', 16, 8); }
+            playCrashSound();
             gameOver(); } }
         if (c.z < -CAMERA_PULLBACK - 0.5) cars.splice(i,1);
       }
