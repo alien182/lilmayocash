@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>LilMayo.Cash</title>
+<title>Lil Mayo — Cash Collect</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -120,10 +120,14 @@
     filter: brightness(0.40) saturate(1.1); z-index: -1; }
   #overlay.crashed-out > div { position: relative; z-index: 1; }
   #overlay .title-bg { font-size: clamp(28px, 5vw, 40px); font-weight: 500;
-    letter-spacing: 4px; margin-bottom: 8px; }
+    letter-spacing: 4px; margin-bottom: 22px; }
   #overlay .sub-bg { font-size: 14px; opacity: 0.8; margin-bottom: 18px;
     max-width: 380px; margin-left:auto; margin-right:auto;}
   #overlay .keys { font-size: 13px; opacity: 0.7; margin-bottom: 22px; line-height: 1.8; }
+  /* On the HOW TO PLAY overlay, all three sub-lines get equal vertical
+     spacing so they read as a clean stack. */
+  #overlay .overlay-line { font-size: 14px; opacity: 0.85; margin-bottom: 22px;
+    line-height: 1.5; max-width: 420px; margin-left: auto; margin-right: auto; }
   #tier-popup { position: absolute; top: 64px; right: 14px; pointer-events: none;
     background: rgba(20,40,30,0.85); border: 0.5px solid rgba(180,255,196,0.4);
     border-radius: 8px; padding: 8px 14px; color: #cdf4d8;
@@ -140,9 +144,12 @@
     #tier-popup .pop-sub { font-size: 8px; letter-spacing: 1px; margin-top: 1px; }
   }
   .features { padding: 60px 28px; max-width: 1100px; margin: 0 auto; }
-  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  @media (max-width: 720px) {
-    .feature-grid { grid-template-columns: 1fr; }
+  .feature-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+  @media (max-width: 960px) {
+    .feature-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
   }
   .feature-img { border-radius: 14px; overflow: hidden;
     background: linear-gradient(180deg, rgba(20,30,60,0.5), rgba(10,15,35,0.5));
@@ -248,14 +255,14 @@
 <body>
 
 <nav class="nav">
-  <div class="brand">LILMAYO.<span class="cash">CASH</span>&nbsp; GAME</div>
+  <div class="brand">LILMAYO.<span class="cash">CASH</span>GAME</div>
   <div class="nav-alien">👽</div>
 </nav>
 
 <section class="hero">
   <a href="#play" class="hero-play-img"><img src="images/play-button.png" alt="PLAY"></a>
   <h1>LIL MAYO</h1>
-  <div class="play-label">is on his way to <span class="c-g">7</span><span class="c-r">E</span><span class="c-o">L</span><span class="c-g">E</span><span class="c-r">V</span><span class="c-o">E</span><span class="c-g">N</span></div>
+  <div class="play-label">...on his way to <span class="c-g">7</span><span class="c-r">E</span><span class="c-o">L</span><span class="c-g">E</span><span class="c-r">V</span><span class="c-o">E</span><span class="c-g">N</span></div>
   <p class="tag">
     <span class="tag-line">Dodge Traffic and Collect <span class="cash-green-bright">Cash</span></span>
   </p>
@@ -277,9 +284,9 @@
     <div id="overlay">
       <div>
         <div class="title-bg">HOW TO PLAY</div>
-        <div class="sub-bg">One hit and you're cooked</div>
-        <div class="keys">← → or A / D &nbsp;·&nbsp; Spacebar to Start</div>
-        <div class="keys">Tap Left/Right on Mobile</div>
+        <div class="overlay-line">One hit and you're cooked!</div>
+        <div class="overlay-line">← → or A / D &nbsp;·&nbsp; Spacebar to Start</div>
+        <div class="overlay-line">Tap Left/Right on Mobile</div>
         <button id="start-btn">PLAY</button>
       </div>
     </div>
@@ -327,6 +334,8 @@
     <div class="feature-img"><img src="images/feature-1.png" alt=""></div>
     <div class="feature-img"><img src="images/feature-2.png" alt=""></div>
     <div class="feature-img"><img src="images/feature-3.png" alt=""></div>
+    <div class="feature-img"><img src="images/feature-4.png" alt=""></div>
+    <div class="feature-img"><img src="images/feature-5.png" alt=""></div>
   </div>
 </section>
 
@@ -355,12 +364,12 @@
   // these values publicly — they identify your project, not authorize it.
   // Get it from Firebase Console → Project Settings → Your apps → Web app.
   const firebaseConfig = {
-  apiKey: "AIzaSyC_wcz5WprXQ4Q__-mBgdYBfp5Tta9O5is",
-  authDomain: "collect-9c6c9.firebaseapp.com",
-  projectId: "collect-9c6c9",
-  storageBucket: "collect-9c6c9.firebasestorage.app",
-  messagingSenderId: "51162547067",
-  appId: "1:51162547067:web:d41ad26a4dbf5d984c73de",
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // If your Cloud Functions are in a non-default region, set it here.
@@ -411,8 +420,10 @@
 //   images/congratz-bg.png   — background of the leaderboard pop-up
 //   images/crashed-bg.png    — background of the in-game crashed-out screen
 //   images/feature-1.png     — first image slot under the leaderboard
-//   images/feature-2.png     — middle image slot under the leaderboard
-//   images/feature-3.png     — third image slot under the leaderboard
+//   images/feature-2.png     — second image slot
+//   images/feature-3.png     — third image slot
+//   images/feature-4.png     — fourth image slot
+//   images/feature-5.png     — fifth image slot
 // ============================================================
 // ============================================================
 // [LEADERBOARD] · Firebase backed
