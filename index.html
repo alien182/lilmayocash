@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>LilMayo.Cash</title>
+<title>Lil Mayo — Cash Collect</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -51,6 +51,7 @@
     transition: transform 0.15s ease, filter 0.15s ease; }
   .hero .hero-play-img img { display: block;
     width: 100%; max-width: 900px; height: auto; margin: 0 auto;
+    opacity: 0.9;
     /* Full-bleed: image scales to the section width, capped at 900px on
        very wide desktops. On mobile it fills edge-to-edge. */
   }
@@ -97,7 +98,7 @@
     -webkit-touch-callout: none;
     user-select: none; -webkit-user-select: none; }
   #game { width: 100%; height: 100%; display: block;
-    touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+    touch-action: none; -webkit-tap-highlight-color: transparent; }
   #hud { position: absolute; top: 14px; left: 14px; right: 14px;
     display: flex; justify-content: space-between; align-items: flex-start;
     pointer-events: none; font-family: ui-monospace, "SF Mono", Menlo, monospace;
@@ -278,8 +279,8 @@
 <nav class="nav">
   <div class="brand">LILMAYO.<span class="cash">CASH</span><span class="brand-game">GAME</span></div>
   <div class="nav-right">
-    <button id="mute-btn" class="nav-mute" aria-label="Mute music">🔊</button>
     <div class="nav-alien">👽</div>
+    <button id="mute-btn" class="nav-mute" aria-label="Mute music">🔊</button>
   </div>
 </nav>
 
@@ -392,12 +393,12 @@
   // these values publicly — they identify your project, not authorize it.
   // Get it from Firebase Console → Project Settings → Your apps → Web app.
   const firebaseConfig = {
-  apiKey: "AIzaSyC_wcz5WprXQ4Q__-mBgdYBfp5Tta9O5is",
-  authDomain: "collect-9c6c9.firebaseapp.com",
-  projectId: "collect-9c6c9",
-  storageBucket: "collect-9c6c9.firebasestorage.app",
-  messagingSenderId: "51162547067",
-  appId: "1:51162547067:web:d41ad26a4dbf5d984c73de",
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // If your Cloud Functions are in a non-default region, set it here.
@@ -945,11 +946,25 @@ function openNameEntry(opts){
   window.addEventListener('keyup', e => { heldKeys.delete(e.key.toLowerCase()); });
   canvas.addEventListener('pointerdown', e => {
     if (!running) return;
+    // Explicit preventDefault so iOS Safari doesn't interpret the touch
+    // as scroll/gesture input. Combined with touch-action: none on the
+    // canvas, this stops the page-shift on rapid taps.
+    e.preventDefault();
     const r = canvas.getBoundingClientRect();
     const tx = e.clientX - r.left;
     if (tx < r.width / 2) laneIndex = Math.max(0, laneIndex - 1);
     else laneIndex = Math.min(LANES_X.length - 1, laneIndex + 1);
   });
+  // Belt-and-suspenders: explicitly swallow touchstart/touchmove on the
+  // canvas. Some iOS versions ignore touch-action and only respect
+  // preventDefault() on the actual touch events. passive:false is required
+  // for preventDefault() to take effect on touch handlers.
+  canvas.addEventListener('touchstart', e => {
+    if (running) e.preventDefault();
+  }, { passive: false });
+  canvas.addEventListener('touchmove', e => {
+    if (running) e.preventDefault();
+  }, { passive: false });
 
   // ---- [STATE] · live game variables ----
   let running = false, score = 0, speed = 1, distance = 0, topSpeed = 1;
