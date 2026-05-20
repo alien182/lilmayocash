@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>LilMayo.Cash</title>
+<title>Lil Mayo — Cash Collect</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -99,6 +99,16 @@
     user-select: none; -webkit-user-select: none; }
   #game { width: 100%; height: 100%; display: block;
     touch-action: none; -webkit-tap-highlight-color: transparent; }
+  /* Landscape mode on phones (and small tablets) makes the screen very
+     wide and short. With our 16:10 frame, the canvas gets squished
+     vertically and the alien's head gets clipped. Cap the game frame
+     to a sensible max-height in this case — the frame becomes
+     letterboxed (smaller than full width) but the alien stays visible.
+     Desktop is unaffected: hover:none + max-height:500px targets only
+     touch devices with limited vertical space. */
+  @media (orientation: landscape) and (hover: none) and (max-height: 500px) {
+    .game-frame { max-width: calc(80vh * 1.6); margin-left: auto; margin-right: auto; }
+  }
   #hud { position: absolute; top: 14px; left: 14px; right: 14px;
     display: flex; justify-content: space-between; align-items: flex-start;
     pointer-events: none; font-family: ui-monospace, "SF Mono", Menlo, monospace;
@@ -393,13 +403,12 @@
   // these values publicly — they identify your project, not authorize it.
   // Get it from Firebase Console → Project Settings → Your apps → Web app.
   const firebaseConfig = {
-  apiKey: "AIzaSyC_wcz5WprXQ4Q__-mBgdYBfp5Tta9O5is",
-  authDomain: "collect-9c6c9.firebaseapp.com",
-  projectId: "collect-9c6c9",
-  storageBucket: "collect-9c6c9.firebasestorage.app",
-  messagingSenderId: "51162547067",
-  appId: "1:51162547067:web:d41ad26a4dbf5d984c73de",
-  measurementId: "G-9JHP85MVZ0"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
   };
 
   // If your Cloud Functions are in a non-default region, set it here.
